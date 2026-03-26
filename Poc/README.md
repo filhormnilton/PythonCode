@@ -4,27 +4,43 @@ Esta pasta contém os artefatos de modelagem para a solução recomendada de **G
 
 ---
 
-## Arquivos
+## 👁️ Visualização Rápida Online (sem instalar nada)
 
-| Arquivo | Descrição | Como Abrir |
+> Clique nos links abaixo para abrir cada arquivo diretamente no navegador:
+
+| Arquivo | Abrir Online | Descrição |
 |---|---|---|
-| `engineered-project-flow.bpmn` | Processo BPMN 2.0 completo do fluxo engenheirado, com 5 swim lanes, gateways, boundary timers e service tasks | **[Camunda Modeler](https://camunda.com/download/modeler/)** (v5+) |
-| `architecture-diagram.drawio` | Diagrama de arquitetura com as 3 seções da solução: Fluxo Padrão, Módulo Engenheirado e Orquestração API | **[app.diagrams.net](https://app.diagrams.net)** ou Extensão VS Code Draw.io |
+| 📐 `architecture-diagram.drawio` | **[▶ Abrir no diagrams.net](https://app.diagrams.net/#Uhttps://raw.githubusercontent.com/filhormnilton/PythonCode/main/Poc/architecture-diagram.drawio)** | Diagrama de arquitetura — Fluxo Padrão + Módulo Engenheirado + API |
+| 🔄 `engineered-project-flow.bpmn` | **[▶ Abrir no bpmn.io](https://demo.bpmn.io/)** *(faça upload do arquivo)* | Processo BPMN 2.0 com 5 swim lanes e gates de aprovação |
+| 📄 `README.md` | Você está aqui ✅ | Renderizado automaticamente pelo GitHub |
+
+### Como visualizar o diagrama Draw.io (1 clique)
+1. Clique no link **"▶ Abrir no diagrams.net"** na tabela acima
+2. O diagrama abrirá automaticamente no navegador, sem login nem download
+
+### Como visualizar o BPMN (sem instalar o Camunda Modeler)
+**Opção A — bpmn.io (online, gratuito):**
+1. Acesse **[demo.bpmn.io](https://demo.bpmn.io/)**
+2. Clique em **"open"** ou arraste o arquivo `engineered-project-flow.bpmn` para a página
+
+**Opção B — Camunda Modeler (desktop, completo):**
+1. Baixe e instale o **[Camunda Modeler](https://camunda.com/download/modeler/)** (versão 5+)
+2. Abra o app e clique em **File → Open File…**
+3. Selecione `engineered-project-flow.bpmn`
+
+**Opção C — VS Code:**
+1. Instale a extensão **[BPMN Editor](https://marketplace.visualstudio.com/items?itemName=bpmnio.bpmn-vscode-extension)** no VS Code
+2. Abra o arquivo `.bpmn` diretamente no editor — ele renderiza automaticamente
 
 ---
 
-## Como Abrir os Arquivos
+## Arquivos desta pasta
 
-### `engineered-project-flow.bpmn`
-1. Baixe e instale o **[Camunda Modeler](https://camunda.com/download/modeler/)** (versão 5 ou superior)
-2. Abra o Camunda Modeler
-3. Clique em **File → Open File…** e selecione `engineered-project-flow.bpmn`
-4. O processo será exibido com todas as lanes, tarefas, gateways e eventos
-
-### `architecture-diagram.drawio`
-1. Acesse **[app.diagrams.net](https://app.diagrams.net)** no navegador
-2. Clique em **File → Open From → Device** e selecione `architecture-diagram.drawio`
-3. Ou instale a extensão **Draw.io** no VS Code e abra o arquivo diretamente
+| Arquivo | Descrição | Ferramenta |
+|---|---|---|
+| `engineered-project-flow.bpmn` | Processo BPMN 2.0 completo do fluxo engenheirado, com 5 swim lanes, gateways, boundary timers e service tasks | Camunda Modeler v5+ / bpmn.io |
+| `architecture-diagram.drawio` | Diagrama de arquitetura com as 3 seções da solução: Fluxo Padrão, Módulo Engenheirado e Orquestração API | app.diagrams.net / VS Code Draw.io |
+| `README.md` | Esta documentação | GitHub / qualquer editor Markdown |
 
 ---
 

@@ -2,7 +2,38 @@
 
 Ferramenta CLI para gerenciamento de configurações via APIs do Orchestra (WEG).
 
-## Estrutura
+---
+
+## 📁 Estrutura do Repositório
+
+```
+PythonCode/
+├── Poc/                     # ← Pasta Poc (ver abaixo)
+│   ├── README.md
+│   ├── architecture-diagram.drawio
+│   └── engineered-project-flow.bpmn
+├── orchestra_tool/
+│   ├── api/
+│   ├── models/
+│   ├── services/
+│   └── utils/
+├── main.py
+└── requirements.txt
+```
+
+## 📂 Pasta Poc — Scope Manager Evoluído
+
+> A pasta **[`Poc/`](./Poc/)** contém os artefatos de modelagem para o módulo de **Projetos Engenheirados de Máquinas Elétricas Girantes**.
+
+| Arquivo | Visualizar Online |
+|---|---|
+| `architecture-diagram.drawio` | **[▶ Abrir no diagrams.net](https://app.diagrams.net/#Uhttps://raw.githubusercontent.com/filhormnilton/PythonCode/main/Poc/architecture-diagram.drawio)** |
+| `engineered-project-flow.bpmn` | **[▶ Abrir no bpmn.io](https://demo.bpmn.io/)** (arraste o arquivo) |
+| `README.md` (documentação completa) | **[📄 Ver documentação](./Poc/README.md)** |
+
+---
+
+## Estrutura do `orchestra_tool`
 
 ```
 orchestra_tool/

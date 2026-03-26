@@ -1,0 +1,208 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36" version="29.6.6">
+  <diagram id="zsTivu9wg54q9nktjuJ3" name="Page-1">
+    <mxGraphModel dx="1501" dy="868" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title_main" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1;" value="Scope Manager Evoluído — Arquitetura da Solução" vertex="1">
+          <mxGeometry height="40" width="800" x="200" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="section1_bg" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#d6b656;opacity=50;" value="" vertex="1">
+          <mxGeometry height="260" width="1150" x="30" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="section1_title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#d6b656;" value="Seção 1 — Fluxo Padrão (Scope Manager Atual)" vertex="1">
+          <mxGeometry height="30" width="500" x="50" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="std_config" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0a30a;strokeColor=#BD7000;fontColor=#000000;fontStyle=1;" value="Configuration" vertex="1">
+          <mxGeometry height="60" width="120" x="50" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="std_platform" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0a30a;strokeColor=#BD7000;fontColor=#000000;" value="Platform&#xa;[WFF2, WFF3]" vertex="1">
+          <mxGeometry height="60" width="120" x="220" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="std_product" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0a30a;strokeColor=#BD7000;fontColor=#000000;" value="Product&#xa;[W22, AW10, W60]" vertex="1">
+          <mxGeometry height="60" width="130" x="390" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="std_commercial" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0a30a;strokeColor=#BD7000;fontColor=#000000;" value="Commercial&#xa;[W22 Brasil, AW10 A, AW10 BR]" vertex="1">
+          <mxGeometry height="60" width="160" x="570" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="std_elec_platform" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0a30a;strokeColor=#BD7000;fontColor=#000000;" value="Electrical&#xa;Platform" vertex="1">
+          <mxGeometry height="60" width="120" x="780" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="std_elec_project" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0a30a;strokeColor=#BD7000;fontColor=#000000;" value="Electrical&#xa;Project" vertex="1">
+          <mxGeometry height="60" width="120" x="950" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="std_collection" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#f0a30a;strokeColor=#BD7000;fontColor=#000000;fontStyle=1;" value="Collection&#xa;ElectricalSystem" vertex="1">
+          <mxGeometry height="80" width="140" x="830" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="arr_cfg_plt" edge="1" parent="1" source="std_config" style="edgeStyle=orthogonalEdgeStyle;" target="std_platform">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr_plt_prd" edge="1" parent="1" source="std_platform" style="edgeStyle=orthogonalEdgeStyle;" target="std_product">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr_prd_com" edge="1" parent="1" source="std_product" style="edgeStyle=orthogonalEdgeStyle;" target="std_commercial">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr_com_ep" edge="1" parent="1" source="std_commercial" style="edgeStyle=orthogonalEdgeStyle;" target="std_elec_platform">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr_ep_ej" edge="1" parent="1" source="std_elec_platform" style="edgeStyle=orthogonalEdgeStyle;" target="std_elec_project">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr_ej_col" edge="1" parent="1" source="std_elec_project" style="edgeStyle=orthogonalEdgeStyle;" target="std_collection" value="Filter in Collection">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="section2_bg" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6c8ebf;opacity=50;" value="" vertex="1">
+          <mxGeometry height="420" width="1150" x="30" y="380" as="geometry" />
+        </mxCell>
+        <mxCell id="section2_title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#6c8ebf;" value="Seção 2 — Módulo Engenheirado (NOVO)" vertex="1">
+          <mxGeometry height="30" width="500" x="60" y="385" as="geometry" />
+        </mxCell>
+        <mxCell id="eng_project" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=3;fontSize=13;" value="EngineeringProject" vertex="1">
+          <mxGeometry height="60" width="180" x="50" y="460" as="geometry" />
+        </mxCell>
+        <mxCell id="anchor_box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="[1] Anchor Product&#xa;(referência ao produto padrão)" vertex="1">
+          <mxGeometry height="60" width="180" x="290" y="450" as="geometry" />
+        </mxCell>
+        <mxCell id="deviation_box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;" value="[2] Deviation Register" vertex="1">
+          <mxGeometry height="60" width="160" x="530" y="450" as="geometry" />
+        </mxCell>
+        <mxCell id="dev1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#6c8ebf;fontColor=#333333;" value="Deviation #1&#xa;campo | spec | BOM impact" vertex="1">
+          <mxGeometry height="50" width="180" x="520" y="540" as="geometry" />
+        </mxCell>
+        <mxCell id="dev2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#6c8ebf;fontColor=#333333;" value="Deviation #2&#xa;campo | spec | BOM impact" vertex="1">
+          <mxGeometry height="50" width="180" x="520" y="600" as="geometry" />
+        </mxCell>
+        <mxCell id="devN" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#6c8ebf;fontColor=#333333;dashed=1;" value="Deviation #N&#xa;campo | spec | BOM impact" vertex="1">
+          <mxGeometry height="50" width="180" x="520" y="660" as="geometry" />
+        </mxCell>
+        <mxCell id="approval_box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;" value="[3] Approval Gates" vertex="1">
+          <mxGeometry height="60" width="160" x="770" y="450" as="geometry" />
+        </mxCell>
+        <mxCell id="gate1" parent="1" style="shape=mxgraph.flowchart.decision;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="&lt;font style=&quot;font-size: 10px;&quot;&gt;Gate 1: Technical Review&lt;br&gt;&lt;/font&gt;(Aprovador Engenharia)" vertex="1">
+          <mxGeometry height="60" width="180" x="760" y="540" as="geometry" />
+        </mxCell>
+        <mxCell id="gate2" parent="1" style="shape=mxgraph.flowchart.decision;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="Gate 2: Commercial Review&#xa;(Aprovador Comercial)" vertex="1">
+          <mxGeometry height="60" width="180" x="760" y="630" as="geometry" />
+        </mxCell>
+        <mxCell id="scope_consol" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#007bff;strokeColor=#0057b8;fontColor=#ffffff;fontStyle=1;" value="[4] Scope Consolidation&#xa;OUTPUT: Cotação Final" vertex="1">
+          <mxGeometry height="70" width="160" x="1000" y="550" as="geometry" />
+        </mxCell>
+        <mxCell id="arr_eng_anchor" edge="1" parent="1" source="eng_project" style="edgeStyle=orthogonalEdgeStyle;" target="anchor_box">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr_eng_dev" edge="1" parent="1" source="eng_project" style="edgeStyle=orthogonalEdgeStyle;exitX=0.592;exitY=0.992;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="deviation_box">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="157" y="530" />
+              <mxPoint x="490" y="530" />
+              <mxPoint x="490" y="480" />
+            </Array>
+            <mxPoint x="310" y="530" as="sourcePoint" />
+            <mxPoint x="558" y="500" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arr_eng_gate" edge="1" parent="1" source="eng_project" style="edgeStyle=orthogonalEdgeStyle;" target="approval_box">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="140" y="430" />
+              <mxPoint x="850" y="430" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arr_dev_d1" edge="1" parent="1" source="deviation_box" style="edgeStyle=orthogonalEdgeStyle;" target="dev1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr_d1_d2" edge="1" parent="1" source="dev1" style="edgeStyle=orthogonalEdgeStyle;" target="dev2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr_d2_dN" edge="1" parent="1" source="dev2" style="edgeStyle=orthogonalEdgeStyle;dashed=1;" target="devN">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr_gate_g1" edge="1" parent="1" source="approval_box" style="edgeStyle=orthogonalEdgeStyle;" target="gate1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr_g1_g2" edge="1" parent="1" source="gate1" style="edgeStyle=orthogonalEdgeStyle;" target="gate2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr_g2_consol" edge="1" parent="1" source="gate2" style="edgeStyle=orthogonalEdgeStyle;" target="scope_consol" value="aprovado">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr_anchor_col" edge="1" parent="1" source="anchor_box" style="edgeStyle=orthogonalEdgeStyle;dashed=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" target="std_collection" value="via Finder">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="section3_bg" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673a6;opacity=50;" value="" vertex="1">
+          <mxGeometry height="200" width="1150" x="30" y="840" as="geometry" />
+        </mxCell>
+        <mxCell id="section3_title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#9673a6;" value="Seção 3 — Orquestração API" vertex="1">
+          <mxGeometry height="30" width="400" x="50" y="850" as="geometry" />
+        </mxCell>
+        <mxCell id="api_orch" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#9673a6;strokeColor=#6d3a9e;fontColor=#ffffff;fontStyle=1;fontSize=13;" value="API Orchestration" vertex="1">
+          <mxGeometry height="70" width="180" x="100" y="900" as="geometry" />
+        </mxCell>
+        <mxCell id="api_scope_manager" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673a6;" value="Scope Manager&#xa;(Standard Flow)" vertex="1">
+          <mxGeometry height="70" width="180" x="370" y="900" as="geometry" />
+        </mxCell>
+        <mxCell id="api_eng_module" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673a6;" value="Engineering Module&#xa;(Engineered Flow)" vertex="1">
+          <mxGeometry height="70" width="180" x="640" y="900" as="geometry" />
+        </mxCell>
+        <mxCell id="api_finder" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673a6;" value="Finder&#xa;(busca âncoras na Collection)" vertex="1">
+          <mxGeometry height="70" width="200" x="910" y="900" as="geometry" />
+        </mxCell>
+        <mxCell id="arr_api_sm" edge="1" parent="1" source="api_orch" style="edgeStyle=orthogonalEdgeStyle;" target="api_scope_manager" value="Standard">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr_api_em" edge="1" parent="1" source="api_orch" style="edgeStyle=orthogonalEdgeStyle;" target="api_eng_module" value="Engineered">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="190" y="990" />
+              <mxPoint x="730" y="990" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arr_api_finder" edge="1" parent="1" source="api_orch" style="edgeStyle=orthogonalEdgeStyle;" target="api_finder" value="busca âncoras">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="190" y="1020" />
+              <mxPoint x="1010" y="1020" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arr_sm_to_s1" edge="1" parent="1" source="api_scope_manager" style="edgeStyle=orthogonalEdgeStyle;dashed=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="std_config" value="gerencia">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="460" y="880" />
+              <mxPoint x="40" y="880" />
+              <mxPoint x="40" y="190" />
+            </Array>
+            <mxPoint x="110" y="220" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arr_em_to_s2" edge="1" parent="1" source="api_eng_module" style="edgeStyle=orthogonalEdgeStyle;dashed=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="eng_project" value="gerencia">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="legend_bg" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#999999;" value="" vertex="1">
+          <mxGeometry height="330" width="220" x="1220" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="legend_title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;" value="Legenda" vertex="1">
+          <mxGeometry height="30" width="200" x="1220" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="leg_std" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0a30a;strokeColor=#BD7000;" value="Fluxo Padrão (existente)" vertex="1">
+          <mxGeometry height="40" width="170" x="1235" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="leg_eng" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="Módulo Engenheirado (novo)" vertex="1">
+          <mxGeometry height="40" width="170" x="1235" y="205" as="geometry" />
+        </mxCell>
+        <mxCell id="leg_api" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673a6;" value="Orquestração API" vertex="1">
+          <mxGeometry height="40" width="170" x="1235" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="leg_out" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#007bff;strokeColor=#0057b8;fontColor=#ffffff;" value="Output / Cotação" vertex="1">
+          <mxGeometry height="40" width="170" x="1235" y="315" as="geometry" />
+        </mxCell>
+        <mxCell id="leg_col" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=10;fillColor=#f0a30a;strokeColor=#BD7000;" value="Collection / Storage" vertex="1">
+          <mxGeometry height="50" width="170" x="1235" y="365" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

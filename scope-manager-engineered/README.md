@@ -22,7 +22,7 @@ Este diretório contém os artefatos de modelagem para o módulo de **Gerenciame
 4. O diagrama será carregado com todas as lanes, tarefas, gateways e boundary events.
 5. Para fazer o deploy no Camunda Engine, use **Deploy Current Diagram** (ícone de nuvem).
 
-> **Nota:** O arquivo é compatível com **Camunda 8** (namespace `http://camunda.org/schema/1.0/bpmn`).
+> **Nota:** O arquivo utiliza o namespace de extensão do **Camunda 7 / Camunda Platform** (`xmlns:camunda="http://camunda.org/schema/1.0/bpmn"`), com atributos como `camunda:assignee`, `camunda:candidateGroups` e `camunda:class`. Para migrar para **Camunda 8 (Zeebe)**, substitua o namespace `camunda:` pelo `zeebe:` (`xmlns:zeebe="http://camunda.org/schema/zeebe/1.0"`) e adapte as extensões conforme a documentação de migração: https://docs.camunda.io/docs/guides/migrating-from-camunda-7/
 
 ---
 

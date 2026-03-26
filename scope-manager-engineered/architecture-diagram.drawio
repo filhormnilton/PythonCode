@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxGraphModel dx="1920" dy="1080" grid="1" gridSize="10" guides="1" tooltips="1"
+              connect="1" arrows="1" fold="1" page="1" pageScale="1"
+              pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+  <root>
+    <mxCell id="0"/>
+    <mxCell id="1" parent="0"/>
+
+    <!-- ================================================================ -->
+    <!--  TITLE                                                            -->
+    <!-- ================================================================ -->
+    <mxCell id="title" value="Scope Manager Evoluído — Projetos Engenheirados de Máquinas Elétricas Girantes"
+            style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#1a1a2e;"
+            vertex="1" parent="1">
+      <mxGeometry x="60" y="20" width="1540" height="40" as="geometry"/>
+    </mxCell>
+
+    <!-- ================================================================ -->
+    <!--  SECTION 1 — FLUXO PADRÃO (orange/gray)                          -->
+    <!-- ================================================================ -->
+    <mxCell id="sec1_bg" value=""
+            style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=2;verticalAlign=top;fontSize=12;opacity=30;"
+            vertex="1" parent="1">
+      <mxGeometry x="60" y="80" width="1540" height="220" as="geometry"/>
+    </mxCell>
+    <mxCell id="sec1_label" value="① FLUXO PADRÃO (existente)"
+            style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;fontSize=13;fontStyle=1;fontColor=#7a4f00;"
+            vertex="1" parent="1">
+      <mxGeometry x="80" y="88" width="300" height="24" as="geometry"/>
+    </mxCell>
+
+    <!-- Configuration -->
+    <mxCell id="p_config" value="Configuration"
+            style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0a30a;strokeColor=#BD7000;fontColor=#000000;fontStyle=1;fontSize=11;"
+            vertex="1" parent="1">
+      <mxGeometry x="90" y="130" width="130" height="50" as="geometry"/>
+    </mxCell>
+    <!-- Platform -->
+    <mxCell id="p_platform" value="Platform&#xa;[WFF2, WFF3…]"
+            style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0a30a;strokeColor=#BD7000;fontColor=#000000;fontSize=11;"
+            vertex="1" parent="1">
+      <mxGeometry x="270" y="130" width="130" height="50" as="geometry"/>
+    </mxCell>
+    <!-- Product -->
+    <mxCell id="p_product" value="Product&#xa;[W22, AW10, W60…]"
+            style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0a30a;strokeColor=#BD7000;fontColor=#000000;fontSize=11;"
+            vertex="1" parent="1">
+      <mxGeometry x="450" y="130" width="140" height="50" as="geometry"/>
+    </mxCell>
+    <!-- Commercial -->
+    <mxCell id="p_commercial" value="Commercial&#xa;[W22 Brasil, AW10 A…]"
+            style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0a30a;strokeColor=#BD7000;fontColor=#000000;fontSize=11;"
+            vertex="1" parent="1">
+      <mxGeometry x="640" y="130" width="150" height="50" as="geometry"/>
+    </mxCell>
+    <!-- ElectricalPlatform -->
+    <mxCell id="p_elplatform" value="ElectricalPlatform"
+            style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0a30a;strokeColor=#BD7000;fontColor=#000000;fontSize=11;"
+            vertex="1" parent="1">
+      <mxGeometry x="840" y="130" width="140" height="50" as="geometry"/>
+    </mxCell>
+    <!-- ElectricalProject -->
+    <mxCell id="p_elproject" value="ElectricalProject&#xa;[Filter in Collection]"
+            style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0a30a;strokeColor=#BD7000;fontColor=#000000;fontSize=11;"
+            vertex="1" parent="1">
+      <mxGeometry x="1030" y="130" width="150" height="50" as="geometry"/>
+    </mxCell>
+    <!-- Collection ElectricalSystem (cylinder) -->
+    <mxCell id="p_collection" value="Collection&#xa;ElectricalSystem"
+            style="shape=cylinder3;whiteSpace=wrap;html=1;fillColor=#d79b00;strokeColor=#995700;fontColor=#ffffff;fontStyle=1;fontSize=11;"
+            vertex="1" parent="1">
+      <mxGeometry x="1240" y="115" width="140" height="70" as="geometry"/>
+    </mxCell>
+
+    <!-- Arrows: standard flow -->
+    <mxCell id="arr_p1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#BD7000;strokeWidth=2;"
+            edge="1" source="p_config" target="p_platform" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="arr_p2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#BD7000;strokeWidth=2;"
+            edge="1" source="p_platform" target="p_product" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="arr_p3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#BD7000;strokeWidth=2;"
+            edge="1" source="p_product" target="p_commercial" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="arr_p4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#BD7000;strokeWidth=2;"
+            edge="1" source="p_commercial" target="p_elplatform" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="arr_p5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#BD7000;strokeWidth=2;"
+            edge="1" source="p_elplatform" target="p_elproject" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="arr_p6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#BD7000;strokeWidth=2;"
+            edge="1" source="p_elproject" target="p_collection" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- ================================================================ -->
+    <!--  SECTION 2 — FLUXO ENGENHEIRADO (blue/green) NOVO               -->
+    <!-- ================================================================ -->
+    <mxCell id="sec2_bg" value=""
+            style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;verticalAlign=top;fontSize=12;opacity=30;"
+            vertex="1" parent="1">
+      <mxGeometry x="60" y="330" width="1540" height="560" as="geometry"/>
+    </mxCell>
+    <mxCell id="sec2_label" value="② MÓDULO ENGENHEIRADO (NOVO)"
+            style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;fontSize=13;fontStyle=1;fontColor=#00509e;"
+            vertex="1" parent="1">
+      <mxGeometry x="80" y="338" width="340" height="24" as="geometry"/>
+    </mxCell>
+
+    <!-- EngineeringProject (main entity) -->
+    <mxCell id="eng_proj" value="&lt;b&gt;EngineeringProject&lt;/b&gt;&#xa;cliente | descrição | prazo&#xa;tipo: ENGINEERED / SEMI-ENGINEERED"
+            style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1e4d8c;strokeColor=#1e4d8c;fontColor=#ffffff;fontSize=12;verticalAlign=middle;"
+            vertex="1" parent="1">
+      <mxGeometry x="90" y="380" width="240" height="80" as="geometry"/>
+    </mxCell>
+
+    <!-- [1] Anchor Product -->
+    <mxCell id="eng_anchor" value="[1] Anchor Product&#xa;Referência ao produto padrão&#xa;(via Finder → Collection)"
+            style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0e7490;strokeColor=#0e7490;fontColor=#ffffff;fontSize=11;"
+            vertex="1" parent="1">
+      <mxGeometry x="410" y="370" width="200" height="70" as="geometry"/>
+    </mxCell>
+
+    <!-- [2] Deviation Register -->
+    <mxCell id="eng_dev_reg" value="[2] Deviation Register"
+            style="rounded=1;whiteSpace=wrap;html=1;fillColor=#157347;strokeColor=#157347;fontColor=#ffffff;fontStyle=1;fontSize=12;"
+            vertex="1" parent="1">
+      <mxGeometry x="410" y="480" width="200" height="50" as="geometry"/>
+    </mxCell>
+    <!-- Deviation items -->
+    <mxCell id="eng_dev1" value="Deviation Item #1&#xa;campo modificado | spec custom | impacto BOM"
+            style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;"
+            vertex="1" parent="1">
+      <mxGeometry x="670" y="450" width="300" height="50" as="geometry"/>
+    </mxCell>
+    <mxCell id="eng_dev2" value="Deviation Item #2&#xa;campo modificado | spec custom | impacto BOM"
+            style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;"
+            vertex="1" parent="1">
+      <mxGeometry x="670" y="520" width="300" height="50" as="geometry"/>
+    </mxCell>
+    <mxCell id="eng_devN" value="Deviation Item #N&#xa;campo modificado | spec custom | impacto BOM"
+            style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;"
+            vertex="1" parent="1">
+      <mxGeometry x="670" y="590" width="300" height="50" as="geometry"/>
+    </mxCell>
+
+    <!-- [3] Approval Gates -->
+    <mxCell id="eng_gates" value="[3] Approval Gates"
+            style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1565c0;strokeColor=#1565c0;fontColor=#ffffff;fontStyle=1;fontSize=12;"
+            vertex="1" parent="1">
+      <mxGeometry x="410" y="680" width="200" height="50" as="geometry"/>
+    </mxCell>
+    <!-- Gate 1 -->
+    <mxCell id="gate1" value="Gate 1: Technical Review&#xa;Engenheiro → Aprovador Eng."
+            style="shape=mxgraph.flowchart.decision;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=10;"
+            vertex="1" parent="1">
+      <mxGeometry x="680" y="665" width="170" height="70" as="geometry"/>
+    </mxCell>
+    <!-- Gate 2 -->
+    <mxCell id="gate2" value="Gate 2: Commercial Review&#xa;Comercial → Aprovador Comercial"
+            style="shape=mxgraph.flowchart.decision;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=10;"
+            vertex="1" parent="1">
+      <mxGeometry x="900" y="665" width="190" height="70" as="geometry"/>
+    </mxCell>
+
+    <!-- [4] Scope Consolidation -->
+    <mxCell id="eng_scope" value="[4] Scope Consolidation"
+            style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1e4d8c;strokeColor=#1e4d8c;fontColor=#ffffff;fontStyle=1;fontSize=12;"
+            vertex="1" parent="1">
+      <mxGeometry x="410" y="790" width="200" height="50" as="geometry"/>
+    </mxCell>
+    <!-- Output -->
+    <mxCell id="eng_output" value="OUTPUT: Escopo Final&#xa;Produto Âncora + Desvios Aprovados&#xa;Status: LIBERADO PARA COTAÇÃO"
+            style="rounded=1;whiteSpace=wrap;html=1;fillColor=#00b050;strokeColor=#006621;fontColor=#ffffff;fontStyle=1;fontSize=11;"
+            vertex="1" parent="1">
+      <mxGeometry x="680" y="780" width="280" height="70" as="geometry"/>
+    </mxCell>
+
+    <!-- Internal arrows: engineered module -->
+    <mxCell id="arr_e1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#1e4d8c;strokeWidth=2;"
+            edge="1" source="eng_proj" target="eng_anchor" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="arr_e2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;strokeColor=#1e4d8c;strokeWidth=2;"
+            edge="1" source="eng_proj" target="eng_dev_reg" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="arr_e3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;strokeColor=#1e4d8c;strokeWidth=2;"
+            edge="1" source="eng_proj" target="eng_gates" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="arr_e4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;strokeColor=#1e4d8c;strokeWidth=2;"
+            edge="1" source="eng_proj" target="eng_scope" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="arr_e5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#157347;strokeWidth=1.5;"
+            edge="1" source="eng_dev_reg" target="eng_dev1" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="arr_e6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#157347;strokeWidth=1.5;"
+            edge="1" source="eng_dev_reg" target="eng_dev2" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="arr_e7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#157347;strokeWidth=1.5;"
+            edge="1" source="eng_dev_reg" target="eng_devN" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="arr_e8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#1565c0;strokeWidth=1.5;"
+            edge="1" source="eng_gates" target="gate1" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="arr_e9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#1565c0;strokeWidth=1.5;"
+            edge="1" source="gate1" target="gate2" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="870" y="700"/>
+          <mxPoint x="870" y="700"/>
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="arr_e10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#1e4d8c;strokeWidth=1.5;"
+            edge="1" source="eng_scope" target="eng_output" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- Anchor → Collection cross-reference arrow -->
+    <mxCell id="arr_anchor_collection"
+            value="busca âncora via Finder"
+            style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0;entryX=0.5;entryY=1;strokeColor=#0e7490;strokeWidth=2;dashed=1;dashPattern=8 4;endArrow=open;endFill=0;fontColor=#0e7490;fontSize=10;"
+            edge="1" source="eng_anchor" target="p_collection" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="1310" y="405"/>
+          <mxPoint x="1310" y="185"/>
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- ================================================================ -->
+    <!--  SECTION 3 — ORQUESTRAÇÃO / INTEGRAÇÃO (purple)                  -->
+    <!-- ================================================================ -->
+    <mxCell id="sec3_bg" value=""
+            style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=2;verticalAlign=top;fontSize=12;opacity=30;"
+            vertex="1" parent="1">
+      <mxGeometry x="60" y="920" width="1540" height="200" as="geometry"/>
+    </mxCell>
+    <mxCell id="sec3_label" value="③ ORQUESTRAÇÃO / INTEGRAÇÃO"
+            style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;fontSize=13;fontStyle=1;fontColor=#5a2d82;"
+            vertex="1" parent="1">
+      <mxGeometry x="80" y="928" width="340" height="24" as="geometry"/>
+    </mxCell>
+
+    <!-- API Orchestration -->
+    <mxCell id="api_orch" value="API Orchestration"
+            style="rounded=1;whiteSpace=wrap;html=1;fillColor=#7b2d8b;strokeColor=#5a2d82;fontColor=#ffffff;fontStyle=1;fontSize=13;"
+            vertex="1" parent="1">
+      <mxGeometry x="90" y="980" width="200" height="60" as="geometry"/>
+    </mxCell>
+    <!-- Scope Manager box -->
+    <mxCell id="sm_box" value="Scope Manager&#xa;(Standard Flow)"
+            style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0a30a;strokeColor=#BD7000;fontColor=#000000;fontSize=12;"
+            vertex="1" parent="1">
+      <mxGeometry x="380" y="980" width="200" height="60" as="geometry"/>
+    </mxCell>
+    <!-- Engineering Module box -->
+    <mxCell id="em_box" value="Engineering Module&#xa;(Engineered Flow)"
+            style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1e4d8c;strokeColor=#1e4d8c;fontColor=#ffffff;fontSize=12;"
+            vertex="1" parent="1">
+      <mxGeometry x="670" y="980" width="200" height="60" as="geometry"/>
+    </mxCell>
+    <!-- Finder box -->
+    <mxCell id="finder_box" value="Finder&#xa;(busca âncoras no&#xa;Collection ElectricalSystem)"
+            style="rounded=1;whiteSpace=wrap;html=1;fillColor=#9673a6;strokeColor=#5a2d82;fontColor=#ffffff;fontSize=11;"
+            vertex="1" parent="1">
+      <mxGeometry x="960" y="970" width="230" height="70" as="geometry"/>
+    </mxCell>
+
+    <!-- Arrows: orchestration -->
+    <mxCell id="arr_o1" value=""
+            style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#7b2d8b;strokeWidth=2;"
+            edge="1" source="api_orch" target="sm_box" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="arr_o2" value=""
+            style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#7b2d8b;strokeWidth=2;"
+            edge="1" source="sm_box" target="em_box" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="arr_o3" value=""
+            style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#7b2d8b;strokeWidth=2;"
+            edge="1" source="em_box" target="finder_box" parent="1">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- Legend -->
+    <mxCell id="legend_bg" value=""
+            style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;strokeWidth=1;"
+            vertex="1" parent="1">
+      <mxGeometry x="1280" y="920" width="320" height="200" as="geometry"/>
+    </mxCell>
+    <mxCell id="legend_title" value="Legenda"
+            style="text;html=1;strokeColor=none;fillColor=none;align=center;fontStyle=1;fontSize=13;fontColor=#333333;"
+            vertex="1" parent="1">
+      <mxGeometry x="1280" y="930" width="320" height="24" as="geometry"/>
+    </mxCell>
+    <mxCell id="leg1" value=""
+            style="rounded=1;fillColor=#f0a30a;strokeColor=#BD7000;"
+            vertex="1" parent="1">
+      <mxGeometry x="1300" y="965" width="30" height="20" as="geometry"/>
+    </mxCell>
+    <mxCell id="leg1_t" value="Fluxo Padrão (Standard)"
+            style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;"
+            vertex="1" parent="1">
+      <mxGeometry x="1340" y="965" width="240" height="20" as="geometry"/>
+    </mxCell>
+    <mxCell id="leg2" value=""
+            style="rounded=1;fillColor=#1e4d8c;strokeColor=#1e4d8c;"
+            vertex="1" parent="1">
+      <mxGeometry x="1300" y="995" width="30" height="20" as="geometry"/>
+    </mxCell>
+    <mxCell id="leg2_t" value="Módulo Engenheirado (NOVO)"
+            style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;"
+            vertex="1" parent="1">
+      <mxGeometry x="1340" y="995" width="240" height="20" as="geometry"/>
+    </mxCell>
+    <mxCell id="leg3" value=""
+            style="rounded=1;fillColor=#7b2d8b;strokeColor=#5a2d82;"
+            vertex="1" parent="1">
+      <mxGeometry x="1300" y="1025" width="30" height="20" as="geometry"/>
+    </mxCell>
+    <mxCell id="leg3_t" value="Orquestração / Integração"
+            style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;"
+            vertex="1" parent="1">
+      <mxGeometry x="1340" y="1025" width="240" height="20" as="geometry"/>
+    </mxCell>
+    <mxCell id="leg4" value=""
+            style="rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;"
+            vertex="1" parent="1">
+      <mxGeometry x="1300" y="1055" width="30" height="20" as="geometry"/>
+    </mxCell>
+    <mxCell id="leg4_t" value="Deviation Items"
+            style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;"
+            vertex="1" parent="1">
+      <mxGeometry x="1340" y="1055" width="240" height="20" as="geometry"/>
+    </mxCell>
+    <mxCell id="leg5" value=""
+            style="shape=mxgraph.flowchart.decision;fillColor=#ffe6cc;strokeColor=#d79b00;"
+            vertex="1" parent="1">
+      <mxGeometry x="1300" y="1085" width="30" height="20" as="geometry"/>
+    </mxCell>
+    <mxCell id="leg5_t" value="Gateway / Approval Gate"
+            style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;"
+            vertex="1" parent="1">
+      <mxGeometry x="1340" y="1085" width="240" height="20" as="geometry"/>
+    </mxCell>
+
+  </root>
+</mxGraphModel>

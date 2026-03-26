@@ -1,0 +1,534 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+             id="definitions_engineered"
+             targetNamespace="http://camunda.org/schema/1.0/bpmn"
+             exporter="Camunda Modeler"
+             exporterVersion="5.0.0">
+
+  <process id="engineered-project-process"
+           name="Processo de Projeto Engenheirado — Máquinas Elétricas Girantes"
+           isExecutable="true">
+
+    <!-- ============================================================ -->
+    <!--  LANES                                                        -->
+    <!-- ============================================================ -->
+    <laneSet id="laneSet_1">
+
+      <lane id="lane_solicitante" name="Solicitante Comercial">
+        <flowNodeRef>startEvent_1</flowNodeRef>
+        <flowNodeRef>task_criar_projeto</flowNodeRef>
+        <flowNodeRef>task_selecionar_anchor</flowNodeRef>
+        <flowNodeRef>task_revisar_requisitos</flowNodeRef>
+        <flowNodeRef>task_enviar_cotacao</flowNodeRef>
+        <flowNodeRef>endEvent_1</flowNodeRef>
+      </lane>
+
+      <lane id="lane_engenheiro" name="Engenheiro Elétrico">
+        <flowNodeRef>task_capturar_requisitos</flowNodeRef>
+        <flowNodeRef>task_registrar_desvios</flowNodeRef>
+        <flowNodeRef>gateway_desvios_criticos</flowNodeRef>
+        <flowNodeRef>task_justificativa_tecnica</flowNodeRef>
+        <flowNodeRef>task_revisar_desvios</flowNodeRef>
+      </lane>
+
+      <lane id="lane_aprovador_eng" name="Aprovador de Engenharia">
+        <flowNodeRef>task_revisar_escopo_tecnico</flowNodeRef>
+        <flowNodeRef>gateway_aprovado_engenharia</flowNodeRef>
+        <flowNodeRef>boundary_timer_eng</flowNodeRef>
+      </lane>
+
+      <lane id="lane_aprovador_comercial" name="Aprovador Comercial">
+        <flowNodeRef>task_revisar_cotacao</flowNodeRef>
+        <flowNodeRef>gateway_aprovado_comercial</flowNodeRef>
+        <flowNodeRef>boundary_timer_comercial</flowNodeRef>
+      </lane>
+
+      <lane id="lane_sistema" name="Sistema (Scope Manager)">
+        <flowNodeRef>task_consolidar_scope</flowNodeRef>
+        <flowNodeRef>task_gerar_output</flowNodeRef>
+      </lane>
+
+    </laneSet>
+
+    <!-- ============================================================ -->
+    <!--  EVENTS & TASKS                                               -->
+    <!-- ============================================================ -->
+
+    <!-- START -->
+    <startEvent id="startEvent_1" name="Novo Projeto&#10;Engenheirado">
+      <outgoing>flow_start_to_criar</outgoing>
+    </startEvent>
+
+    <!-- Lane: Solicitante Comercial -->
+    <userTask id="task_criar_projeto"
+              name="Criar EngineeringProject"
+              camunda:assignee="${solicitante}"
+              camunda:candidateGroups="solicitante-comercial">
+      <documentation>
+        Inputs: cliente, descrição, prazo, tipo (ENGINEERED / SEMI-ENGINEERED).
+        Cria o registro principal do EngineeringProject no Scope Manager.
+      </documentation>
+      <incoming>flow_start_to_criar</incoming>
+      <outgoing>flow_criar_to_anchor</outgoing>
+    </userTask>
+
+    <userTask id="task_selecionar_anchor"
+              name="Selecionar Anchor Product"
+              camunda:assignee="${solicitante}"
+              camunda:candidateGroups="solicitante-comercial">
+      <documentation>
+        Busca o produto âncora no Collection ElectricalSystem via Finder.
+        O Anchor Product é o produto padrão que servirá de base para o projeto.
+      </documentation>
+      <incoming>flow_criar_to_anchor</incoming>
+      <outgoing>flow_anchor_to_requisitos</outgoing>
+    </userTask>
+
+    <!-- Lane: Engenheiro Elétrico -->
+    <userTask id="task_capturar_requisitos"
+              name="Capturar Requisitos Técnicos"
+              camunda:assignee="${engenheiro}"
+              camunda:candidateGroups="engenheiro-eletrico">
+      <documentation>
+        Captura: ElectricalSpecs, MechanicalConstraints, SiteConditions.
+        Estes requisitos definem as diferenças em relação ao produto âncora.
+      </documentation>
+      <incoming>flow_anchor_to_requisitos</incoming>
+      <incoming>flow_revisao_comercial_to_requisitos</incoming>
+      <outgoing>flow_requisitos_to_desvios</outgoing>
+    </userTask>
+
+    <userTask id="task_registrar_desvios"
+              name="Registrar Deviation List"
+              camunda:assignee="${engenheiro}"
+              camunda:candidateGroups="engenheiro-eletrico">
+      <documentation>
+        Para cada item que difere do produto âncora:
+        [item] → [spec customizada] → [impacto BOM].
+        Registra todos os desvios no DeviationRegister.
+      </documentation>
+      <incoming>flow_requisitos_to_desvios</incoming>
+      <incoming>flow_revisao_eng_to_desvios</incoming>
+      <outgoing>flow_desvios_to_gateway</outgoing>
+    </userTask>
+
+    <exclusiveGateway id="gateway_desvios_criticos"
+                      name="Existem desvios&#10;críticos?">
+      <incoming>flow_desvios_to_gateway</incoming>
+      <outgoing>flow_gateway_sim</outgoing>
+      <outgoing>flow_gateway_nao</outgoing>
+    </exclusiveGateway>
+
+    <userTask id="task_justificativa_tecnica"
+              name="Documentar Justificativa Técnica"
+              camunda:assignee="${engenheiro}"
+              camunda:candidateGroups="engenheiro-eletrico">
+      <documentation>
+        Documenta a justificativa técnica para cada desvio crítico identificado.
+      </documentation>
+      <incoming>flow_gateway_sim</incoming>
+      <outgoing>flow_justificativa_to_consolidar</outgoing>
+    </userTask>
+
+    <!-- Lane: Sistema (Scope Manager) -->
+    <serviceTask id="task_consolidar_scope"
+                 name="Consolidar Scope&#10;(Âncora + Desvios)"
+                 camunda:class="com.scopemanager.engineered.ConsolidateScopeDelegate">
+      <documentation>
+        Tarefa automática: consolida o escopo final = Produto Âncora + Desvios registrados.
+        Gera o EngineeringScope consolidado para revisão.
+      </documentation>
+      <incoming>flow_gateway_nao</incoming>
+      <incoming>flow_justificativa_to_consolidar</incoming>
+      <outgoing>flow_consolidar_to_gate1</outgoing>
+    </serviceTask>
+
+    <!-- Lane: Aprovador de Engenharia -->
+    <userTask id="task_revisar_escopo_tecnico"
+              name="Revisar Escopo Técnico&#10;(Gate 1)"
+              camunda:assignee="${aprovadorEngenharia}"
+              camunda:candidateGroups="aprovador-engenharia">
+      <documentation>
+        Gate 1 — Revisão técnica do escopo consolidado.
+        Aprovador verifica desvios, justificativas e consistência técnica.
+      </documentation>
+      <incoming>flow_consolidar_to_gate1</incoming>
+      <outgoing>flow_gate1_to_gateway_eng</outgoing>
+    </userTask>
+
+    <boundaryEvent id="boundary_timer_eng"
+                   name="Timeout 5 dias"
+                   attachedToRef="task_revisar_escopo_tecnico"
+                   cancelActivity="true">
+      <timerEventDefinition>
+        <timeDuration xsi:type="tFormalExpression">P5D</timeDuration>
+      </timerEventDefinition>
+      <outgoing>flow_timer_eng_to_revisar_desvios</outgoing>
+    </boundaryEvent>
+
+    <exclusiveGateway id="gateway_aprovado_engenharia"
+                      name="Aprovado pela&#10;Engenharia?">
+      <incoming>flow_gate1_to_gateway_eng</incoming>
+      <outgoing>flow_eng_aprovado</outgoing>
+      <outgoing>flow_eng_rejeitado</outgoing>
+    </exclusiveGateway>
+
+    <userTask id="task_revisar_desvios"
+              name="Revisar Desvios"
+              camunda:assignee="${engenheiro}"
+              camunda:candidateGroups="engenheiro-eletrico">
+      <documentation>
+        Engenheiro revisa os desvios com base no feedback do aprovador de engenharia.
+      </documentation>
+      <incoming>flow_eng_rejeitado</incoming>
+      <incoming>flow_timer_eng_to_revisar_desvios</incoming>
+      <outgoing>flow_revisao_eng_to_desvios</outgoing>
+    </userTask>
+
+    <!-- Lane: Aprovador Comercial -->
+    <userTask id="task_revisar_cotacao"
+              name="Revisar Cotação e Escopo&#10;Consolidado (Gate 2)"
+              camunda:assignee="${aprovadorComercial}"
+              camunda:candidateGroups="aprovador-comercial">
+      <documentation>
+        Gate 2 — Revisão comercial do escopo consolidado e cotação.
+        Aprovador verifica viabilidade comercial, prazo e margem.
+      </documentation>
+      <incoming>flow_eng_aprovado</incoming>
+      <outgoing>flow_gate2_to_gateway_comercial</outgoing>
+    </userTask>
+
+    <boundaryEvent id="boundary_timer_comercial"
+                   name="Timeout 5 dias"
+                   attachedToRef="task_revisar_cotacao"
+                   cancelActivity="true">
+      <timerEventDefinition>
+        <timeDuration xsi:type="tFormalExpression">P5D</timeDuration>
+      </timerEventDefinition>
+      <outgoing>flow_timer_comercial_to_revisar_req</outgoing>
+    </boundaryEvent>
+
+    <exclusiveGateway id="gateway_aprovado_comercial"
+                      name="Aprovado&#10;Comercialmente?">
+      <incoming>flow_gate2_to_gateway_comercial</incoming>
+      <outgoing>flow_comercial_aprovado</outgoing>
+      <outgoing>flow_comercial_rejeitado</outgoing>
+    </exclusiveGateway>
+
+    <!-- Lane: Sistema (Scope Manager) — Output -->
+    <serviceTask id="task_gerar_output"
+                 name="Gerar Output de Cotação"
+                 camunda:expression="${scopeOutputService.generate(execution)}">
+      <documentation>
+        Tarefa automática: gera o output final da cotação.
+        Escopo final = Produto Âncora + Desvios aprovados.
+        Status: LIBERADO PARA COTAÇÃO.
+      </documentation>
+      <incoming>flow_comercial_aprovado</incoming>
+      <outgoing>flow_output_to_enviar</outgoing>
+    </serviceTask>
+
+    <!-- Lane: Solicitante Comercial — Envio -->
+    <userTask id="task_revisar_requisitos"
+              name="Revisar Requisitos"
+              camunda:assignee="${solicitante}"
+              camunda:candidateGroups="solicitante-comercial">
+      <documentation>
+        Solicitante revisa os requisitos com base no feedback do aprovador comercial.
+      </documentation>
+      <incoming>flow_comercial_rejeitado</incoming>
+      <incoming>flow_timer_comercial_to_revisar_req</incoming>
+      <outgoing>flow_revisao_comercial_to_requisitos</outgoing>
+    </userTask>
+
+    <userTask id="task_enviar_cotacao"
+              name="Enviar Cotação ao Cliente"
+              camunda:assignee="${solicitante}"
+              camunda:candidateGroups="solicitante-comercial">
+      <documentation>
+        Solicitante envia a cotação aprovada ao cliente final.
+      </documentation>
+      <incoming>flow_output_to_enviar</incoming>
+      <outgoing>flow_enviar_to_end</outgoing>
+    </userTask>
+
+    <!-- END -->
+    <endEvent id="endEvent_1" name="Projeto Engenheirado&#10;Concluído">
+      <incoming>flow_enviar_to_end</incoming>
+    </endEvent>
+
+    <!-- ============================================================ -->
+    <!--  SEQUENCE FLOWS                                               -->
+    <!-- ============================================================ -->
+    <sequenceFlow id="flow_start_to_criar"        sourceRef="startEvent_1"             targetRef="task_criar_projeto"/>
+    <sequenceFlow id="flow_criar_to_anchor"        sourceRef="task_criar_projeto"        targetRef="task_selecionar_anchor"/>
+    <sequenceFlow id="flow_anchor_to_requisitos"   sourceRef="task_selecionar_anchor"   targetRef="task_capturar_requisitos"/>
+    <sequenceFlow id="flow_requisitos_to_desvios"  sourceRef="task_capturar_requisitos" targetRef="task_registrar_desvios"/>
+    <sequenceFlow id="flow_desvios_to_gateway"     sourceRef="task_registrar_desvios"   targetRef="gateway_desvios_criticos"/>
+
+    <sequenceFlow id="flow_gateway_sim"
+                  name="SIM"
+                  sourceRef="gateway_desvios_criticos"
+                  targetRef="task_justificativa_tecnica">
+      <conditionExpression xsi:type="tFormalExpression">${desviosCriticos == true}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow_gateway_nao"
+                  name="NÃO"
+                  sourceRef="gateway_desvios_criticos"
+                  targetRef="task_consolidar_scope">
+      <conditionExpression xsi:type="tFormalExpression">${desviosCriticos == false}</conditionExpression>
+    </sequenceFlow>
+
+    <sequenceFlow id="flow_justificativa_to_consolidar" sourceRef="task_justificativa_tecnica" targetRef="task_consolidar_scope"/>
+    <sequenceFlow id="flow_consolidar_to_gate1"          sourceRef="task_consolidar_scope"      targetRef="task_revisar_escopo_tecnico"/>
+    <sequenceFlow id="flow_gate1_to_gateway_eng"         sourceRef="task_revisar_escopo_tecnico" targetRef="gateway_aprovado_engenharia"/>
+
+    <sequenceFlow id="flow_eng_aprovado"
+                  name="APROVADO"
+                  sourceRef="gateway_aprovado_engenharia"
+                  targetRef="task_revisar_cotacao">
+      <conditionExpression xsi:type="tFormalExpression">${aprovacaoEngenharia == 'APROVADO'}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow_eng_rejeitado"
+                  name="REJEITADO"
+                  sourceRef="gateway_aprovado_engenharia"
+                  targetRef="task_revisar_desvios">
+      <conditionExpression xsi:type="tFormalExpression">${aprovacaoEngenharia == 'REJEITADO'}</conditionExpression>
+    </sequenceFlow>
+
+    <sequenceFlow id="flow_revisao_eng_to_desvios"       sourceRef="task_revisar_desvios"       targetRef="task_registrar_desvios"/>
+    <sequenceFlow id="flow_timer_eng_to_revisar_desvios" sourceRef="boundary_timer_eng"          targetRef="task_revisar_desvios"/>
+    <sequenceFlow id="flow_gate2_to_gateway_comercial"   sourceRef="task_revisar_cotacao"        targetRef="gateway_aprovado_comercial"/>
+
+    <sequenceFlow id="flow_comercial_aprovado"
+                  name="APROVADO"
+                  sourceRef="gateway_aprovado_comercial"
+                  targetRef="task_gerar_output">
+      <conditionExpression xsi:type="tFormalExpression">${aprovacaoComercial == 'APROVADO'}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow_comercial_rejeitado"
+                  name="REJEITADO"
+                  sourceRef="gateway_aprovado_comercial"
+                  targetRef="task_revisar_requisitos">
+      <conditionExpression xsi:type="tFormalExpression">${aprovacaoComercial == 'REJEITADO'}</conditionExpression>
+    </sequenceFlow>
+
+    <sequenceFlow id="flow_timer_comercial_to_revisar_req" sourceRef="boundary_timer_comercial"  targetRef="task_revisar_requisitos"/>
+    <sequenceFlow id="flow_revisao_comercial_to_requisitos" sourceRef="task_revisar_requisitos"  targetRef="task_capturar_requisitos"/>
+    <sequenceFlow id="flow_output_to_enviar"               sourceRef="task_gerar_output"         targetRef="task_enviar_cotacao"/>
+    <sequenceFlow id="flow_enviar_to_end"                  sourceRef="task_enviar_cotacao"        targetRef="endEvent_1"/>
+
+  </process>
+
+  <!-- ============================================================ -->
+  <!--  BPMN DIAGRAM (visual layout)                                 -->
+  <!-- ============================================================ -->
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="engineered-project-process">
+
+      <!-- LANES -->
+      <bpmndi:BPMNShape id="lane_solicitante_di"     bpmnElement="lane_solicitante"     isHorizontal="true">
+        <dc:Bounds x="160" y="80"  width="1760" height="160"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="170" y="140" width="30" height="80"/></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="lane_engenheiro_di"      bpmnElement="lane_engenheiro"      isHorizontal="true">
+        <dc:Bounds x="160" y="240" width="1760" height="200"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="170" y="320" width="30" height="80"/></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="lane_aprovador_eng_di"   bpmnElement="lane_aprovador_eng"   isHorizontal="true">
+        <dc:Bounds x="160" y="440" width="1760" height="160"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="170" y="500" width="30" height="80"/></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="lane_aprovador_com_di"   bpmnElement="lane_aprovador_comercial" isHorizontal="true">
+        <dc:Bounds x="160" y="600" width="1760" height="160"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="170" y="660" width="30" height="80"/></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="lane_sistema_di"         bpmnElement="lane_sistema"         isHorizontal="true">
+        <dc:Bounds x="160" y="760" width="1760" height="140"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="170" y="810" width="30" height="80"/></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- START EVENT -->
+      <bpmndi:BPMNShape id="startEvent_1_di" bpmnElement="startEvent_1">
+        <dc:Bounds x="212" y="142" width="36" height="36"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="196" y="185" width="68" height="27"/></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- task_criar_projeto -->
+      <bpmndi:BPMNShape id="task_criar_projeto_di" bpmnElement="task_criar_projeto">
+        <dc:Bounds x="300" y="120" width="140" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- task_selecionar_anchor -->
+      <bpmndi:BPMNShape id="task_selecionar_anchor_di" bpmnElement="task_selecionar_anchor">
+        <dc:Bounds x="500" y="120" width="140" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- task_capturar_requisitos -->
+      <bpmndi:BPMNShape id="task_capturar_requisitos_di" bpmnElement="task_capturar_requisitos">
+        <dc:Bounds x="700" y="280" width="140" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- task_registrar_desvios -->
+      <bpmndi:BPMNShape id="task_registrar_desvios_di" bpmnElement="task_registrar_desvios">
+        <dc:Bounds x="900" y="280" width="140" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- gateway_desvios_criticos -->
+      <bpmndi:BPMNShape id="gateway_desvios_criticos_di" bpmnElement="gateway_desvios_criticos" isMarkerVisible="true">
+        <dc:Bounds x="1095" y="295" width="50" height="50"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="1075" y="352" width="90" height="27"/></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- task_justificativa_tecnica -->
+      <bpmndi:BPMNShape id="task_justificativa_tecnica_di" bpmnElement="task_justificativa_tecnica">
+        <dc:Bounds x="1200" y="280" width="140" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- task_consolidar_scope -->
+      <bpmndi:BPMNShape id="task_consolidar_scope_di" bpmnElement="task_consolidar_scope">
+        <dc:Bounds x="1080" y="790" width="140" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- task_revisar_escopo_tecnico -->
+      <bpmndi:BPMNShape id="task_revisar_escopo_tecnico_di" bpmnElement="task_revisar_escopo_tecnico">
+        <dc:Bounds x="1280" y="460" width="140" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- boundary_timer_eng -->
+      <bpmndi:BPMNShape id="boundary_timer_eng_di" bpmnElement="boundary_timer_eng">
+        <dc:Bounds x="1332" y="522" width="36" height="36"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="1360" y="545" width="72" height="27"/></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- gateway_aprovado_engenharia -->
+      <bpmndi:BPMNShape id="gateway_aprovado_engenharia_di" bpmnElement="gateway_aprovado_engenharia" isMarkerVisible="true">
+        <dc:Bounds x="1475" y="475" width="50" height="50"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="1455" y="532" width="90" height="27"/></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- task_revisar_desvios -->
+      <bpmndi:BPMNShape id="task_revisar_desvios_di" bpmnElement="task_revisar_desvios">
+        <dc:Bounds x="1200" y="380" width="140" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- task_revisar_cotacao -->
+      <bpmndi:BPMNShape id="task_revisar_cotacao_di" bpmnElement="task_revisar_cotacao">
+        <dc:Bounds x="1560" y="620" width="140" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- boundary_timer_comercial -->
+      <bpmndi:BPMNShape id="boundary_timer_comercial_di" bpmnElement="boundary_timer_comercial">
+        <dc:Bounds x="1612" y="682" width="36" height="36"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="1640" y="705" width="72" height="27"/></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- gateway_aprovado_comercial -->
+      <bpmndi:BPMNShape id="gateway_aprovado_comercial_di" bpmnElement="gateway_aprovado_comercial" isMarkerVisible="true">
+        <dc:Bounds x="1755" y="635" width="50" height="50"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="1735" y="692" width="90" height="27"/></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- task_gerar_output -->
+      <bpmndi:BPMNShape id="task_gerar_output_di" bpmnElement="task_gerar_output">
+        <dc:Bounds x="1600" y="790" width="140" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- task_revisar_requisitos -->
+      <bpmndi:BPMNShape id="task_revisar_requisitos_di" bpmnElement="task_revisar_requisitos">
+        <dc:Bounds x="1560" y="120" width="140" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- task_enviar_cotacao -->
+      <bpmndi:BPMNShape id="task_enviar_cotacao_di" bpmnElement="task_enviar_cotacao">
+        <dc:Bounds x="1760" y="120" width="140" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- END EVENT -->
+      <bpmndi:BPMNShape id="endEvent_1_di" bpmnElement="endEvent_1">
+        <dc:Bounds x="1942" y="142" width="36" height="36"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="1920" y="185" width="80" height="27"/></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- =========================================================== -->
+      <!--  SEQUENCE FLOW EDGES                                         -->
+      <!-- =========================================================== -->
+      <bpmndi:BPMNEdge id="flow_start_to_criar_di"        bpmnElement="flow_start_to_criar">
+        <di:waypoint x="248" y="160"/><di:waypoint x="300" y="160"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_criar_to_anchor_di"        bpmnElement="flow_criar_to_anchor">
+        <di:waypoint x="440" y="160"/><di:waypoint x="500" y="160"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_anchor_to_requisitos_di"   bpmnElement="flow_anchor_to_requisitos">
+        <di:waypoint x="570" y="200"/><di:waypoint x="570" y="320"/><di:waypoint x="700" y="320"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_requisitos_to_desvios_di"  bpmnElement="flow_requisitos_to_desvios">
+        <di:waypoint x="840" y="320"/><di:waypoint x="900" y="320"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_desvios_to_gateway_di"     bpmnElement="flow_desvios_to_gateway">
+        <di:waypoint x="1040" y="320"/><di:waypoint x="1095" y="320"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_gateway_sim_di"            bpmnElement="flow_gateway_sim">
+        <di:waypoint x="1145" y="320"/><di:waypoint x="1200" y="320"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="1158" y="302" width="22" height="14"/></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_gateway_nao_di"            bpmnElement="flow_gateway_nao">
+        <di:waypoint x="1120" y="345"/><di:waypoint x="1120" y="790"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="1125" y="560" width="25" height="14"/></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_justificativa_to_consolidar_di" bpmnElement="flow_justificativa_to_consolidar">
+        <di:waypoint x="1270" y="360"/><di:waypoint x="1270" y="830"/><di:waypoint x="1220" y="830"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_consolidar_to_gate1_di"    bpmnElement="flow_consolidar_to_gate1">
+        <di:waypoint x="1150" y="830"/><di:waypoint x="1350" y="830"/><di:waypoint x="1350" y="540"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_gate1_to_gateway_eng_di"   bpmnElement="flow_gate1_to_gateway_eng">
+        <di:waypoint x="1420" y="500"/><di:waypoint x="1475" y="500"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_eng_aprovado_di"           bpmnElement="flow_eng_aprovado">
+        <di:waypoint x="1500" y="525"/><di:waypoint x="1500" y="660"/><di:waypoint x="1560" y="660"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="1505" y="585" width="55" height="14"/></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_eng_rejeitado_di"          bpmnElement="flow_eng_rejeitado">
+        <di:waypoint x="1475" y="500"/><di:waypoint x="1340" y="500"/><di:waypoint x="1340" y="420"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="1390" y="480" width="60" height="14"/></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_revisao_eng_to_desvios_di" bpmnElement="flow_revisao_eng_to_desvios">
+        <di:waypoint x="1200" y="420"/><di:waypoint x="970" y="420"/><di:waypoint x="970" y="360"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_timer_eng_to_revisar_desvios_di" bpmnElement="flow_timer_eng_to_revisar_desvios">
+        <di:waypoint x="1350" y="558"/><di:waypoint x="1350" y="460"/><di:waypoint x="1270" y="460"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_gate2_to_gateway_comercial_di" bpmnElement="flow_gate2_to_gateway_comercial">
+        <di:waypoint x="1700" y="660"/><di:waypoint x="1755" y="660"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_comercial_aprovado_di"     bpmnElement="flow_comercial_aprovado">
+        <di:waypoint x="1780" y="685"/><di:waypoint x="1780" y="830"/><di:waypoint x="1740" y="830"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="1785" y="750" width="55" height="14"/></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_comercial_rejeitado_di"    bpmnElement="flow_comercial_rejeitado">
+        <di:waypoint x="1780" y="635"/><di:waypoint x="1780" y="160"/><di:waypoint x="1700" y="160"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="1785" y="390" width="60" height="14"/></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_timer_comercial_to_revisar_req_di" bpmnElement="flow_timer_comercial_to_revisar_req">
+        <di:waypoint x="1630" y="682"/><di:waypoint x="1630" y="160"/><di:waypoint x="1700" y="160"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_revisao_comercial_to_requisitos_di" bpmnElement="flow_revisao_comercial_to_requisitos">
+        <di:waypoint x="1560" y="160"/><di:waypoint x="770" y="160"/><di:waypoint x="770" y="280"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_output_to_enviar_di"       bpmnElement="flow_output_to_enviar">
+        <di:waypoint x="1670" y="790"/><di:waypoint x="1670" y="160"/><di:waypoint x="1760" y="160"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_enviar_to_end_di"          bpmnElement="flow_enviar_to_end">
+        <di:waypoint x="1900" y="160"/><di:waypoint x="1942" y="160"/>
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+
+</definitions>

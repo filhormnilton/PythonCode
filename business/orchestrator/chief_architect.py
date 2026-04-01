@@ -30,6 +30,7 @@ from business.agents.miro_agent import create_miro_agent
 from business.agents.process_agent import create_process_agent
 from business.agents.slides_agent import create_slides_agent
 from business.agents.web_agent import create_web_agent
+from business.mcp.api_knowledge_base import KNOWLEDGE_BASE_TOOLS
 
 logger = logging.getLogger(__name__)
 
@@ -56,6 +57,18 @@ helpers:
   6_PROCESS:   scope="Camunda Modeler BPMN"         actions=[C,R,U,D]
   7_MIRO:      scope="Brainstorming Boards"         actions=[C,R,U,D]
 
+## [KNOWLEDGE_BASE]
+- The orchestrator has DIRECT access to the local knowledge base (no helper needed).
+- Use add_knowledge_entry to persist important findings, decisions, or reference material.
+- Use search_knowledge_base before delegating to helpers to enrich context with prior knowledge.
+- Use list_knowledge_entries to show the user what knowledge has been accumulated.
+- Knowledge base is stored at: business_output/knowledge_base/
+
+## [MEMORY]
+- Conversation history is automatically maintained per session.
+- For persistence across restarts, set COSMOS_ENDPOINT + COSMOS_KEY environment variables.
+- The knowledge base provides cross-session, persistent domain memory.
+
 ## [EXECUTION_MODES]
 | ID | Operation                     | Helpers Activated         |
 |----|-------------------------------|---------------------------|
@@ -71,7 +84,7 @@ helpers:
 - Zero ambiguity: if the request is unclear, ask ONE clarifying question before proceeding.
 - Loop options after each response: [1. Refinar Definição | 2. Despachar | 3. Stress Test]
 
-You have access to tools that delegate work to each specialist agent.
+You have access to tools that delegate work to each specialist agent AND to the knowledge base.
 Use them according to the routing table above.
 """
 
@@ -214,6 +227,8 @@ class BusinessOrchestrator:
             delegate_to_web,
             delegate_to_process,
             delegate_to_miro,
+            # Knowledge base tools are directly available to the orchestrator
+            *KNOWLEDGE_BASE_TOOLS,
         ]
 
     # ------------------------------------------------------------------

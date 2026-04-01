@@ -69,6 +69,10 @@ class OutputConfig:
     def bpmn_dir(self) -> Path:
         return self.base_dir / "bpmn"
 
+    @property
+    def knowledge_base_dir(self) -> Path:
+        return self.base_dir / "knowledge_base"
+
 
 @dataclass(frozen=True)
 class BusinessConfig:

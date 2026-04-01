@@ -5,6 +5,7 @@ Draw.io uses XML internally; these tools manipulate the XML representation direc
 """
 import xml.etree.ElementTree as ET
 from pathlib import Path
+from typing import List
 
 from langchain_core.tools import tool
 
@@ -337,7 +338,7 @@ def create_drawio_from_template(filename: str, template: str) -> str:
     path = CONFIG.output.diagrams_dir / f"{filename}.drawio"
     spec = _TEMPLATES[template]
 
-    cells_xml: list[str] = []
+    cells_xml: List[str] = []
     for cell_id, value, style, x, y, w, h in spec["cells"]:
         cells_xml.append(
             f'<mxCell id="{cell_id}" value="{value}" style="{style}" '

@@ -150,11 +150,14 @@ class CosmosDBHistoryStore(HistoryStore):
     # -- helpers ---------------------------------------------------------------
 
     def _item_id(self, conversation_id: str) -> str:
-        # CosmosDB item IDs may not contain the following characters: '/', '\', '?', '#'.
-        # Teams conversation IDs commonly contain '|' (pipe) and ':' (colon), which are
-        # safe for CosmosDB IDs but replaced here for URL-friendliness when used as
-        # partition keys and REST path segments.
-        return conversation_id.replace("|", "_").replace(":", "_")
+        # CosmosDB item IDs may not contain '/', '\', '?', '#'.
+        # Teams conversation IDs commonly contain '|' and ':'; these are safe for CosmosDB IDs
+        # but are replaced for URL-friendliness when used as REST path segments.
+        # The forbidden characters are also sanitised as a safety measure.
+        sanitised = conversation_id
+        for ch in ("|", ":", "/", "\\", "?", "#"):
+            sanitised = sanitised.replace(ch, "_")
+        return sanitised
 
     # -- interface implementation ----------------------------------------------
 

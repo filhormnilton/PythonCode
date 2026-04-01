@@ -297,3 +297,136 @@ class TestArchitectureDiagram:
         content = diagram.read_text(encoding="utf-8")
         for agent in ["DOCS", "SLIDES", "ARCHITECT", "JIRA", "WEB", "PROCESS", "MIRO"]:
             assert agent in content, f"Agent '{agent}' not found in architecture diagram"
+
+
+# ---------------------------------------------------------------------------
+# Knowledge Base MCP (local file tools — no external dependencies)
+# ---------------------------------------------------------------------------
+
+class TestKnowledgeBaseMcp:
+    @pytest.fixture(autouse=True)
+    def _patch_kb_dir(self, tmp_path, monkeypatch):
+        """Redirect KB output directory and reload affected modules for each test."""
+        import importlib
+        from business import config as cfg_module
+        monkeypatch.setenv("BUSINESS_OUTPUT_DIR", str(tmp_path))
+        importlib.reload(cfg_module)
+        import business.mcp.api_knowledge_base as kb_module
+        importlib.reload(kb_module)
+        self._kb = kb_module
+
+    def test_tools_exported(self):
+        assert len(self._kb.KNOWLEDGE_BASE_TOOLS) == 6
+        names = [t.name for t in self._kb.KNOWLEDGE_BASE_TOOLS]
+        assert "add_knowledge_entry" in names
+        assert "search_knowledge_base" in names
+        assert "get_knowledge_entry" in names
+        assert "list_knowledge_entries" in names
+        assert "update_knowledge_entry" in names
+        assert "remove_knowledge_entry" in names
+
+    def test_add_and_get(self):
+        result = self._kb.add_knowledge_entry.invoke({
+            "title": "REST API Best Practices",
+            "content": "Use nouns for resources, HTTP verbs for actions.",
+            "tags": "api,rest",
+            "source": "https://restfulapi.net",
+        })
+        assert "REST API Best Practices" in result
+        entry_id = result.split("ID=")[1].split(" ")[0]
+
+        detail = self._kb.get_knowledge_entry.invoke({"entry_id": entry_id})
+        assert "REST API Best Practices" in detail
+        assert "Use nouns for resources" in detail
+        assert "api" in detail
+
+    def test_list_empty(self):
+        result = self._kb.list_knowledge_entries.invoke({})
+        assert "empty" in result.lower()
+
+    def test_list_with_entries(self):
+        self._kb.add_knowledge_entry.invoke({
+            "title": "BPMN Gateway Types",
+            "content": "Exclusive, Inclusive, Parallel gateways.",
+            "tags": "bpmn,process",
+        })
+        result = self._kb.list_knowledge_entries.invoke({})
+        assert "BPMN Gateway Types" in result
+
+    def test_list_tag_filter(self):
+        self._kb.add_knowledge_entry.invoke({
+            "title": "Entry A",
+            "content": "Content A",
+            "tags": "jira,agile",
+        })
+        self._kb.add_knowledge_entry.invoke({
+            "title": "Entry B",
+            "content": "Content B",
+            "tags": "bpmn",
+        })
+        result = self._kb.list_knowledge_entries.invoke({"tag_filter": "jira"})
+        assert "Entry A" in result
+        assert "Entry B" not in result
+
+    def test_search_found(self):
+        self._kb.add_knowledge_entry.invoke({
+            "title": "Microservices Patterns",
+            "content": "Saga pattern for distributed transactions.",
+            "tags": "microservices,architecture",
+        })
+        result = self._kb.search_knowledge_base.invoke({"query": "saga distributed"})
+        assert "Microservices Patterns" in result
+
+    def test_search_not_found(self):
+        # With an empty KB the message is different from a non-empty one with no match.
+        result = self._kb.search_knowledge_base.invoke({"query": "nonexistent_xyz"})
+        assert "No entries found" in result or "empty" in result.lower()
+
+    def test_update_entry(self):
+        self._kb.add_knowledge_entry.invoke({
+            "title": "Original Title",
+            "content": "Original content.",
+            "tags": "test",
+        })
+        entries = self._kb._load_index()
+        entry_id = entries[0]["id"]
+
+        self._kb.update_knowledge_entry.invoke({
+            "entry_id": entry_id,
+            "content": "Updated content.",
+            "tags": "test,updated",
+        })
+
+        detail = self._kb.get_knowledge_entry.invoke({"entry_id": entry_id})
+        assert "Updated content." in detail
+        assert "updated" in detail
+
+    def test_remove_entry(self):
+        self._kb.add_knowledge_entry.invoke({
+            "title": "To Remove",
+            "content": "Delete me.",
+            "tags": "temp",
+        })
+        entries = self._kb._load_index()
+        entry_id = entries[0]["id"]
+
+        msg = self._kb.remove_knowledge_entry.invoke({"entry_id": entry_id})
+        assert "removed" in msg.lower()
+
+        detail = self._kb.get_knowledge_entry.invoke({"entry_id": entry_id})
+        assert "not found" in detail.lower()
+
+    def test_remove_nonexistent(self):
+        result = self._kb.remove_knowledge_entry.invoke({"entry_id": "does-not-exist"})
+        assert "not found" in result.lower()
+
+
+# ---------------------------------------------------------------------------
+# Config — knowledge_base_dir
+# ---------------------------------------------------------------------------
+
+class TestKnowledgeBaseConfig:
+    def test_knowledge_base_dir(self):
+        from business.config import load_config
+        cfg = load_config()
+        assert cfg.output.knowledge_base_dir.name == "knowledge_base"

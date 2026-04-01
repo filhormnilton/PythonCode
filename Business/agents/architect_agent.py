@@ -5,8 +5,8 @@ Creates, edits, reviews, saves, and removes architecture diagrams.
 """
 from typing import Any
 
-from business.agents.base import build_agent
-from business.mcp.api_drawio import DRAWIO_TOOLS
+from Business.agents.base import build_agent
+from Business.mcp.api_drawio import DRAWIO_TOOLS
 
 _SYSTEM_PROMPT = """\
 # [HELPER_CONFIG: VISUAL_SYSTEM_ARCHITECT]

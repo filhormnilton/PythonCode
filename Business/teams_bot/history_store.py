@@ -10,7 +10,7 @@ The active implementation is chosen at runtime based on the presence of the
 
 Usage::
 
-    from business.teams_bot.history_store import build_history_store
+    from Business.teams_bot.history_store import build_history_store
 
     store = build_history_store()
     history = store.get("conv-id-123")

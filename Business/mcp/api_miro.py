@@ -8,7 +8,7 @@ from typing import Optional
 import requests
 from langchain_core.tools import tool
 
-from business.config import CONFIG
+from Business.config import CONFIG
 
 _MIRO_BASE = "https://api.miro.com/v2"
 

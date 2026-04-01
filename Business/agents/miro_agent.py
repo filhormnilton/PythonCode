@@ -5,8 +5,8 @@ brainstorming boards and sticky notes in MIRO.
 """
 from typing import Any
 
-from business.agents.base import build_agent
-from business.mcp.api_miro import MIRO_TOOLS
+from Business.agents.base import build_agent
+from Business.mcp.api_miro import MIRO_TOOLS
 
 _SYSTEM_PROMPT = """\
 # [HELPER_CONFIG: IDEATION_&_CANVAS_MANAGER]

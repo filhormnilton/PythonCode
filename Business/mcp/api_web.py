@@ -5,7 +5,7 @@ Uses Tavily (preferred) with a fallback to direct HTTP + BeautifulSoup scraping.
 """
 from langchain_core.tools import tool
 
-from business.config import CONFIG
+from Business.config import CONFIG
 
 _MAX_SNIPPET_LENGTH = 200
 

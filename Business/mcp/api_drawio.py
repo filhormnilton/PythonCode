@@ -9,7 +9,7 @@ from typing import List
 
 from langchain_core.tools import tool
 
-from business.config import CONFIG
+from Business.config import CONFIG
 
 _DRAWIO_HEADER = """<?xml version="1.0" encoding="UTF-8"?>
 <mxfile host="app.diagrams.net" version="21.0.0">

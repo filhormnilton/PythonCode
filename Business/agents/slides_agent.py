@@ -5,8 +5,8 @@ PowerPoint presentations.
 """
 from typing import Any
 
-from business.agents.base import build_agent
-from business.mcp.api_powerpoint import POWERPOINT_TOOLS
+from Business.agents.base import build_agent
+from Business.mcp.api_powerpoint import POWERPOINT_TOOLS
 
 _SYSTEM_PROMPT = """\
 # [HELPER_CONFIG: EXECUTIVE_PRESENTATION_MASTER]

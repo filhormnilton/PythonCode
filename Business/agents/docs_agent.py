@@ -5,8 +5,8 @@ in Word (.docx), PDF, and TXT formats.
 """
 from typing import Any
 
-from business.agents.base import build_agent
-from business.mcp.api_office_pdf import OFFICE_PDF_TOOLS
+from Business.agents.base import build_agent
+from Business.mcp.api_office_pdf import OFFICE_PDF_TOOLS
 
 _SYSTEM_PROMPT = """\
 # [HELPER_CONFIG: DOCUMENT_ARCHITECTURE_ENGINE]

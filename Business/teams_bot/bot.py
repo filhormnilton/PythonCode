@@ -35,7 +35,7 @@ class BusinessBot(ActivityHandler):
     def __init__(self, orchestrator: Any):
         super().__init__()
         self._orchestrator = orchestrator
-        from business.teams_bot.history_store import build_history_store
+        from Business.teams_bot.history_store import build_history_store
         self._store = build_history_store()
 
     async def on_message_activity(self, turn_context: TurnContext) -> None:
@@ -81,7 +81,7 @@ def create_app(orchestrator: Any) -> web.Application:
     Returns:
         Configured aiohttp Application.
     """
-    from business.config import CONFIG
+    from Business.config import CONFIG
 
     settings = BotFrameworkAdapterSettings(
         app_id=CONFIG.teams.app_id,
@@ -123,7 +123,7 @@ def run_bot(orchestrator: Any, port: Optional[int] = None) -> None:
         orchestrator: A BusinessOrchestrator instance.
         port: TCP port to listen on (defaults to CONFIG.teams.port).
     """
-    from business.config import CONFIG
+    from Business.config import CONFIG
 
     listen_port = port or CONFIG.teams.port
     app = create_app(orchestrator)
@@ -138,9 +138,9 @@ if __name__ == "__main__":
         handlers=[logging.StreamHandler(sys.stdout)],
     )
 
-    from business.config import CONFIG
+    from Business.config import CONFIG
     from langchain_openai import ChatOpenAI  # type: ignore
-    from business.orchestrator.chief_architect import create_business_orchestrator
+    from Business.orchestrator.chief_architect import create_business_orchestrator
 
     llm = ChatOpenAI(
         model=CONFIG.llm.model,

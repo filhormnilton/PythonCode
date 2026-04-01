@@ -6,7 +6,7 @@ from pathlib import Path
 
 from langchain_core.tools import tool
 
-from business.config import CONFIG
+from Business.config import CONFIG
 
 
 def _ensure_dir(directory: Path) -> None:

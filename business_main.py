@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 def _build_llm():
     """Instantiate the LLM from configuration."""
-    from business.config import CONFIG
+    from Business.config import CONFIG
     try:
         from langchain_openai import ChatOpenAI  # type: ignore
     except ImportError:
@@ -76,7 +76,7 @@ def run_once(orchestrator, request: str) -> None:
 
 def run_teams(orchestrator) -> None:
     """Start the Microsoft Teams bot server."""
-    from business.teams_bot.bot import run_bot
+    from Business.teams_bot.bot import run_bot
     run_bot(orchestrator)
 
 
@@ -97,7 +97,7 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    from business.orchestrator.chief_architect import create_business_orchestrator
+    from Business.orchestrator.chief_architect import create_business_orchestrator
     llm = _build_llm()
     orchestrator = create_business_orchestrator(llm)
 

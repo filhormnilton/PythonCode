@@ -5,8 +5,8 @@ BPMN process flows using Camunda Modeler and the Camunda REST API.
 """
 from typing import Any
 
-from business.agents.base import build_agent
-from business.mcp.api_camunda import CAMUNDA_TOOLS
+from Business.agents.base import build_agent
+from Business.mcp.api_camunda import CAMUNDA_TOOLS
 
 _SYSTEM_PROMPT = """\
 # [HELPER_CONFIG: BPMN_WORKFLOW_ARCHITECT]

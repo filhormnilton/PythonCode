@@ -22,7 +22,7 @@ sys.path.insert(0, str(ROOT))
 
 class TestConfig:
     def test_config_loads(self):
-        from business.config import load_config
+        from Business.config import load_config
         cfg = load_config()
         assert cfg is not None
         assert cfg.llm is not None
@@ -30,7 +30,7 @@ class TestConfig:
         assert cfg.miro is not None
 
     def test_output_config_paths(self):
-        from business.config import load_config
+        from Business.config import load_config
         cfg = load_config()
         assert cfg.output.docs_dir.name == "docs"
         assert cfg.output.slides_dir.name == "slides"
@@ -39,7 +39,7 @@ class TestConfig:
 
     def test_env_override(self, monkeypatch):
         monkeypatch.setenv("OPENAI_API_KEY", "test-key-123")
-        from business import config as cfg_module
+        from Business import config as cfg_module
         # Reload to pick up the env var
         import importlib
         importlib.reload(cfg_module)
@@ -53,7 +53,7 @@ class TestConfig:
 
 class TestMcpToolExports:
     def test_office_pdf_tools_exported(self):
-        from business.mcp.api_office_pdf import OFFICE_PDF_TOOLS
+        from Business.mcp.api_office_pdf import OFFICE_PDF_TOOLS
         assert len(OFFICE_PDF_TOOLS) >= 7
         names = [t.name for t in OFFICE_PDF_TOOLS]
         assert "create_word_document" in names
@@ -62,14 +62,14 @@ class TestMcpToolExports:
         assert "delete_document" in names
 
     def test_powerpoint_tools_exported(self):
-        from business.mcp.api_powerpoint import POWERPOINT_TOOLS
+        from Business.mcp.api_powerpoint import POWERPOINT_TOOLS
         assert len(POWERPOINT_TOOLS) >= 4
         names = [t.name for t in POWERPOINT_TOOLS]
         assert "create_presentation" in names
         assert "read_presentation" in names
 
     def test_drawio_tools_exported(self):
-        from business.mcp.api_drawio import DRAWIO_TOOLS
+        from Business.mcp.api_drawio import DRAWIO_TOOLS
         assert len(DRAWIO_TOOLS) >= 5
         names = [t.name for t in DRAWIO_TOOLS]
         assert "create_drawio_diagram" in names
@@ -77,28 +77,28 @@ class TestMcpToolExports:
         assert "add_edge_to_diagram" in names
 
     def test_jira_tools_exported(self):
-        from business.mcp.api_jira import JIRA_TOOLS
+        from Business.mcp.api_jira import JIRA_TOOLS
         assert len(JIRA_TOOLS) >= 5
         names = [t.name for t in JIRA_TOOLS]
         assert "create_jira_issue" in names
         assert "search_jira_issues" in names
 
     def test_web_tools_exported(self):
-        from business.mcp.api_web import WEB_TOOLS
+        from Business.mcp.api_web import WEB_TOOLS
         assert len(WEB_TOOLS) >= 2
         names = [t.name for t in WEB_TOOLS]
         assert "web_search" in names
         assert "fetch_webpage" in names
 
     def test_camunda_tools_exported(self):
-        from business.mcp.api_camunda import CAMUNDA_TOOLS
+        from Business.mcp.api_camunda import CAMUNDA_TOOLS
         assert len(CAMUNDA_TOOLS) >= 5
         names = [t.name for t in CAMUNDA_TOOLS]
         assert "create_bpmn_process" in names
         assert "deploy_bpmn_to_camunda" in names
 
     def test_miro_tools_exported(self):
-        from business.mcp.api_miro import MIRO_TOOLS
+        from Business.mcp.api_miro import MIRO_TOOLS
         assert len(MIRO_TOOLS) >= 5
         names = [t.name for t in MIRO_TOOLS]
         assert "create_miro_board" in names
@@ -114,10 +114,10 @@ class TestDrawioMcpLocalTools:
     def _patch_output_dir(self, tmp_path, monkeypatch):
         """Redirect output directory and reload affected modules for each test."""
         import importlib
-        from business import config as cfg_module
+        from Business import config as cfg_module
         monkeypatch.setenv("BUSINESS_OUTPUT_DIR", str(tmp_path))
         importlib.reload(cfg_module)
-        import business.mcp.api_drawio as drawio_module
+        import Business.mcp.api_drawio as drawio_module
         importlib.reload(drawio_module)
         self._drawio = drawio_module
 
@@ -151,10 +151,10 @@ class TestTxtMcpLocalTools:
     @pytest.fixture(autouse=True)
     def _patch_output_dir(self, tmp_path, monkeypatch):
         import importlib
-        from business import config as cfg_module
+        from Business import config as cfg_module
         monkeypatch.setenv("BUSINESS_OUTPUT_DIR", str(tmp_path))
         importlib.reload(cfg_module)
-        import business.mcp.api_office_pdf as docs_module
+        import Business.mcp.api_office_pdf as docs_module
         importlib.reload(docs_module)
         self._docs = docs_module
 
@@ -176,10 +176,10 @@ class TestBpmnMcpLocalTools:
     @pytest.fixture(autouse=True)
     def _patch_output_dir(self, tmp_path, monkeypatch):
         import importlib
-        from business import config as cfg_module
+        from Business import config as cfg_module
         monkeypatch.setenv("BUSINESS_OUTPUT_DIR", str(tmp_path))
         importlib.reload(cfg_module)
-        import business.mcp.api_camunda as camunda_module
+        import Business.mcp.api_camunda as camunda_module
         importlib.reload(camunda_module)
         self._camunda = camunda_module
 
@@ -211,37 +211,37 @@ class TestAgentFactories:
         return llm
 
     def test_docs_agent_factory(self, mock_llm):
-        from business.agents.docs_agent import create_docs_agent
+        from Business.agents.docs_agent import create_docs_agent
         agent = create_docs_agent(mock_llm)
         assert agent is not None
 
     def test_slides_agent_factory(self, mock_llm):
-        from business.agents.slides_agent import create_slides_agent
+        from Business.agents.slides_agent import create_slides_agent
         agent = create_slides_agent(mock_llm)
         assert agent is not None
 
     def test_architect_agent_factory(self, mock_llm):
-        from business.agents.architect_agent import create_architect_agent
+        from Business.agents.architect_agent import create_architect_agent
         agent = create_architect_agent(mock_llm)
         assert agent is not None
 
     def test_jira_agent_factory(self, mock_llm):
-        from business.agents.jira_agent import create_jira_agent
+        from Business.agents.jira_agent import create_jira_agent
         agent = create_jira_agent(mock_llm)
         assert agent is not None
 
     def test_web_agent_factory(self, mock_llm):
-        from business.agents.web_agent import create_web_agent
+        from Business.agents.web_agent import create_web_agent
         agent = create_web_agent(mock_llm)
         assert agent is not None
 
     def test_process_agent_factory(self, mock_llm):
-        from business.agents.process_agent import create_process_agent
+        from Business.agents.process_agent import create_process_agent
         agent = create_process_agent(mock_llm)
         assert agent is not None
 
     def test_miro_agent_factory(self, mock_llm):
-        from business.agents.miro_agent import create_miro_agent
+        from Business.agents.miro_agent import create_miro_agent
         agent = create_miro_agent(mock_llm)
         assert agent is not None
 
@@ -255,7 +255,7 @@ class TestOrchestrator:
         from unittest.mock import MagicMock
         mock_llm = MagicMock()
         mock_llm.bind_tools = MagicMock(return_value=mock_llm)
-        from business.orchestrator.chief_architect import create_business_orchestrator
+        from Business.orchestrator.chief_architect import create_business_orchestrator
         orc = create_business_orchestrator(mock_llm)
         assert orc is not None
 
@@ -264,7 +264,7 @@ class TestOrchestrator:
         from unittest.mock import MagicMock, patch
         mock_llm = MagicMock()
         mock_llm.bind_tools = MagicMock(return_value=mock_llm)
-        from business.orchestrator.chief_architect import BusinessOrchestrator
+        from Business.orchestrator.chief_architect import BusinessOrchestrator
 
         orc = BusinessOrchestrator(mock_llm)
         mock_executor = MagicMock()
@@ -282,18 +282,18 @@ class TestOrchestrator:
 
 class TestArchitectureDiagram:
     def test_diagram_file_exists(self):
-        diagram = ROOT / "business" / "architecture.drawio"
+        diagram = ROOT / "Business" / "architecture.drawio"
         assert diagram.exists(), "architecture.drawio must exist"
 
     def test_diagram_is_valid_xml(self):
         import xml.etree.ElementTree as ET
-        diagram = ROOT / "business" / "architecture.drawio"
+        diagram = ROOT / "Business" / "architecture.drawio"
         tree = ET.parse(str(diagram))
         root = tree.getroot()
         assert root.tag == "mxfile"
 
     def test_diagram_contains_all_agents(self):
-        diagram = ROOT / "business" / "architecture.drawio"
+        diagram = ROOT / "Business" / "architecture.drawio"
         content = diagram.read_text(encoding="utf-8")
         for agent in ["DOCS", "SLIDES", "ARCHITECT", "JIRA", "WEB", "PROCESS", "MIRO"]:
             assert agent in content, f"Agent '{agent}' not found in architecture diagram"
@@ -308,10 +308,10 @@ class TestKnowledgeBaseMcp:
     def _patch_kb_dir(self, tmp_path, monkeypatch):
         """Redirect KB output directory and reload affected modules for each test."""
         import importlib
-        from business import config as cfg_module
+        from Business import config as cfg_module
         monkeypatch.setenv("BUSINESS_OUTPUT_DIR", str(tmp_path))
         importlib.reload(cfg_module)
-        import business.mcp.api_knowledge_base as kb_module
+        import Business.mcp.api_knowledge_base as kb_module
         importlib.reload(kb_module)
         self._kb = kb_module
 
@@ -427,6 +427,6 @@ class TestKnowledgeBaseMcp:
 
 class TestKnowledgeBaseConfig:
     def test_knowledge_base_dir(self):
-        from business.config import load_config
+        from Business.config import load_config
         cfg = load_config()
         assert cfg.output.knowledge_base_dir.name == "knowledge_base"

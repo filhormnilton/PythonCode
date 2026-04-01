@@ -5,8 +5,8 @@ issue management actions: create, read, update, delete, transition, and search.
 """
 from typing import Any
 
-from business.agents.base import build_agent
-from business.mcp.api_jira import JIRA_TOOLS
+from Business.agents.base import build_agent
+from Business.mcp.api_jira import JIRA_TOOLS
 
 _SYSTEM_PROMPT = """\
 # [HELPER_CONFIG: BACKLOG_SYNCHRONIZATION_ENGINE]

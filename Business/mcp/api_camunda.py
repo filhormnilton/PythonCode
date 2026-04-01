@@ -11,7 +11,7 @@ import requests
 
 from langchain_core.tools import tool
 
-from business.config import CONFIG
+from Business.config import CONFIG
 
 _BPMN_NS = "http://www.omg.org/spec/BPMN/20100524/MODEL"
 _CAMUNDA_NS = "http://camunda.org/schema/1.0/bpmn"

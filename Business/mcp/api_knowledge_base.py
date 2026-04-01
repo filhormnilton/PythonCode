@@ -33,7 +33,7 @@ from typing import List, Tuple
 
 from langchain_core.tools import tool
 
-from business.config import CONFIG
+from Business.config import CONFIG
 
 logger = logging.getLogger(__name__)
 

@@ -21,16 +21,16 @@ from typing import Any, Dict, List, Optional
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.tools import BaseTool, tool
 from langchain.agents import create_agent
-from business.agents.base import AgentWrapper
+from Business.agents.base import AgentWrapper
 
-from business.agents.architect_agent import create_architect_agent
-from business.agents.docs_agent import create_docs_agent
-from business.agents.jira_agent import create_jira_agent
-from business.agents.miro_agent import create_miro_agent
-from business.agents.process_agent import create_process_agent
-from business.agents.slides_agent import create_slides_agent
-from business.agents.web_agent import create_web_agent
-from business.mcp.api_knowledge_base import KNOWLEDGE_BASE_TOOLS
+from Business.agents.architect_agent import create_architect_agent
+from Business.agents.docs_agent import create_docs_agent
+from Business.agents.jira_agent import create_jira_agent
+from Business.agents.miro_agent import create_miro_agent
+from Business.agents.process_agent import create_process_agent
+from Business.agents.slides_agent import create_slides_agent
+from Business.agents.web_agent import create_web_agent
+from Business.mcp.api_knowledge_base import KNOWLEDGE_BASE_TOOLS
 
 logger = logging.getLogger(__name__)
 

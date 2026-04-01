@@ -5,8 +5,8 @@ information from web pages to support research and discovery tasks.
 """
 from typing import Any
 
-from business.agents.base import build_agent
-from business.mcp.api_web import WEB_TOOLS
+from Business.agents.base import build_agent
+from Business.mcp.api_web import WEB_TOOLS
 
 _SYSTEM_PROMPT = """\
 # [HELPER_CONFIG: WEB_INTELLIGENCE_EXTRACTOR]

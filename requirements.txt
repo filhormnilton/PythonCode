@@ -1,3 +1,34 @@
+# ── existing dependencies ──────────────────────────────────────────────────
 requests>=2.31.0
 pandas>=2.2.0
 openpyxl>=3.1.2
+
+# ── Business Multi-Agent — LLM / LangChain core ───────────────────────────
+langchain>=0.3.0
+langchain-core>=0.3.0
+langchain-openai>=0.2.0
+
+# ── Business Multi-Agent — Document tools (MCP: api_office_pdf) ───────────
+python-docx>=1.1.0
+reportlab>=4.2.0
+pdfplumber>=0.11.0
+
+# ── Business Multi-Agent — Presentation tools (MCP: api_powerpoint) ───────
+python-pptx>=1.0.0
+
+# ── Business Multi-Agent — JIRA integration (MCP: api_jira) ───────────────
+jira>=3.8.0
+
+# ── Business Multi-Agent — Web research (MCP: api_web) ────────────────────
+beautifulsoup4>=4.12.0
+tavily-python>=0.3.0
+
+# ── Business Multi-Agent — Microsoft Teams Bot ────────────────────────────
+botbuilder-core>=4.16.0
+botbuilder-schema>=4.16.0
+botbuilder-integration-aiohttp>=4.16.0
+aiohttp>=3.10.0
+
+# ── Azure CosmosDB (optional — enables persistent conversation history) ────────
+# Required only when COSMOS_ENDPOINT and COSMOS_KEY environment variables are set.
+azure-cosmos>=4.7.0

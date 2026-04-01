@@ -2,11 +2,14 @@
 MCP: api_jira
 Tools for interacting with JIRA: creating, reading, updating issues and syncing backlogs.
 """
+import logging
 from typing import Optional
 
 from langchain_core.tools import tool
 
 from business.config import CONFIG
+
+logger = logging.getLogger(__name__)
 
 
 def _client():
@@ -203,6 +206,103 @@ def get_project_backlog(project_key: str = "", max_results: int = 50) -> str:
     return "\n".join(lines)
 
 
+def _board_id_for_project(jira, project_key: str) -> Optional[str]:
+    """Return the first Scrum/Kanban board id for the given project key, or None."""
+    try:
+        boards = jira.boards(projectKeyOrID=project_key)
+        return str(boards[0].id) if boards else None
+    except Exception as exc:
+        logger.warning("[JIRA] Could not retrieve boards for project '%s': %s", project_key, exc)
+        return None
+
+
+@tool
+def list_sprints(project_key: str = "", state: str = "active") -> str:
+    """List sprints for a JIRA project board.
+
+    Args:
+        project_key: JIRA project key (defaults to configured project).
+        state: Sprint state filter: active, closed, or future.
+
+    Returns:
+        Formatted list of sprints with id, name and state.
+    """
+    jira = _client()
+    if jira is None:
+        return "ERROR: jira library not installed."
+
+    key = project_key or CONFIG.jira.project_key
+    board_id = _board_id_for_project(jira, key)
+    if board_id is None:
+        return f"No board found for project '{key}'."
+
+    try:
+        sprints = jira.sprints(board_id, state=state)
+    except Exception as exc:
+        return f"ERROR listing sprints: {exc}"
+
+    if not sprints:
+        return f"No {state} sprints found for project '{key}'."
+    lines = [f"ID={s.id} | {s.name} | {s.state}" for s in sprints]
+    return "\n".join(lines)
+
+
+@tool
+def create_sprint(name: str, project_key: str = "", start_date: str = "", end_date: str = "") -> str:
+    """Create a new sprint on the default board of a JIRA project.
+
+    Args:
+        name: Sprint name (e.g. 'Sprint 5 — Authentication').
+        project_key: JIRA project key (defaults to configured project).
+        start_date: Optional ISO 8601 start date (e.g. '2025-05-01T00:00:00.000Z').
+        end_date: Optional ISO 8601 end date.
+
+    Returns:
+        Created sprint id and name.
+    """
+    jira = _client()
+    if jira is None:
+        return "ERROR: jira library not installed."
+
+    key = project_key or CONFIG.jira.project_key
+    board_id = _board_id_for_project(jira, key)
+    if board_id is None:
+        return f"No board found for project '{key}'."
+
+    try:
+        kwargs: dict = {"name": name, "board_id": board_id}
+        if start_date:
+            kwargs["startDate"] = start_date
+        if end_date:
+            kwargs["endDate"] = end_date
+        sprint = jira.create_sprint(**kwargs)
+        return f"Sprint created. ID={sprint.id} | Name={sprint.name}"
+    except Exception as exc:
+        return f"ERROR creating sprint: {exc}"
+
+
+@tool
+def assign_issue_to_sprint(issue_key: str, sprint_id: str) -> str:
+    """Move a JIRA issue to a specific sprint.
+
+    Args:
+        issue_key: JIRA issue key (e.g. 'PROJ-42').
+        sprint_id: Id of the target sprint (use list_sprints to find it).
+
+    Returns:
+        Confirmation message.
+    """
+    jira = _client()
+    if jira is None:
+        return "ERROR: jira library not installed."
+
+    try:
+        jira.add_issues_to_sprint(sprint_id, [issue_key])
+        return f"Issue {issue_key} moved to sprint {sprint_id}."
+    except Exception as exc:
+        return f"ERROR assigning issue to sprint: {exc}"
+
+
 JIRA_TOOLS = [
     create_jira_issue,
     get_jira_issue,
@@ -211,4 +311,7 @@ JIRA_TOOLS = [
     search_jira_issues,
     add_comment_to_issue,
     get_project_backlog,
+    list_sprints,
+    create_sprint,
+    assign_issue_to_sprint,
 ]

@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import logging
 import sys
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 from aiohttp import web
 from botbuilder.core import (  # type: ignore
@@ -35,8 +35,8 @@ class BusinessBot(ActivityHandler):
     def __init__(self, orchestrator: Any):
         super().__init__()
         self._orchestrator = orchestrator
-        # Per-conversation history (in-memory; replace with CosmosDB for production)
-        self._history: Dict[str, List] = {}
+        from business.teams_bot.history_store import build_history_store
+        self._store = build_history_store()
 
     async def on_message_activity(self, turn_context: TurnContext) -> None:
         """Handle an incoming text message from Teams."""
@@ -54,19 +54,20 @@ class BusinessBot(ActivityHandler):
         # Typing indicator
         await turn_context.send_activity(Activity(type="typing"))
 
-        # Retrieve conversation history
-        history = self._history.setdefault(conversation_id, [])
+        # Retrieve conversation history from the configured store
+        history = self._store.get(conversation_id)
 
         try:
             response = self._orchestrator.invoke(user_text, chat_history=history)
         except Exception as exc:
             logger.exception("Orchestrator error: %s", exc)
-            response = f"❌ Erro interno: {exc}"
+            response = "❌ Ocorreu um erro interno ao processar sua solicitação. Por favor, tente novamente."
 
-        # Persist the exchange in history
+        # Persist the exchange
         from langchain_core.messages import HumanMessage, AIMessage  # type: ignore
         history.append(HumanMessage(content=user_text))
         history.append(AIMessage(content=response))
+        self._store.save(conversation_id, history)
 
         await turn_context.send_activity(MessageFactory.text(response))
 
@@ -106,7 +107,11 @@ def create_app(orchestrator: Any) -> web.Application:
             logger.exception("Adapter error: %s", exc)
             return web.Response(status=500, text="Internal server error")
 
+    async def health(_req: web.Request) -> web.Response:
+        return web.json_response({"status": "ok"})
+
     app = web.Application()
+    app.router.add_get("/health", health)
     app.router.add_post("/api/messages", messages)
     return app
 

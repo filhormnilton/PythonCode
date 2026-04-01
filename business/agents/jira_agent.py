@@ -22,6 +22,7 @@ Your responsibilities:
       4. State Transition Validators.
 - Search the backlog with JQL queries.
 - Add structured comments to issues for traceability.
+- Manage sprints: list existing sprints, create new sprints, and assign issues to sprints.
 - Always confirm the issue key after every create or update operation.
 """
 

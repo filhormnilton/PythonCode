@@ -193,6 +193,85 @@ def list_miro_items(board_id: str = "") -> str:
         return f"MIRO list items failed: {exc}"
 
 
+# ---------------------------------------------------------------------------
+# Frame tools
+# ---------------------------------------------------------------------------
+
+@tool
+def create_miro_frame(
+    title: str,
+    x: int = 0,
+    y: int = 0,
+    width: int = 800,
+    height: int = 600,
+    board_id: str = "",
+) -> str:
+    """Create a frame on a MIRO board to group and organise items visually.
+
+    Args:
+        title: Frame title displayed at the top.
+        x: Horizontal position of the frame (default 0).
+        y: Vertical position of the frame (default 0).
+        width: Frame width in pixels (default 800).
+        height: Frame height in pixels (default 600).
+        board_id: Target board id (defaults to configured board).
+
+    Returns:
+        New frame id and its position, or an error message.
+    """
+    bid = _board_id(board_id)
+    url = f"{_MIRO_BASE}/boards/{bid}/frames"
+    payload = {
+        "data": {"title": title, "format": "custom", "type": "freeform"},
+        "position": {"x": x, "y": y},
+        "geometry": {"width": width, "height": height},
+    }
+    try:
+        resp = requests.post(url, json=payload, headers=_headers(), timeout=15)
+        resp.raise_for_status()
+        data = resp.json()
+        return (
+            f"Frame '{title}' created. ID: {data.get('id')} | "
+            f"x={x}, y={y}, {width}x{height}"
+        )
+    except Exception as exc:
+        return f"MIRO create frame failed: {exc}"
+
+
+@tool
+def create_sticky_note_in_frame(
+    content: str,
+    frame_id: str,
+    color: str = "yellow",
+    board_id: str = "",
+) -> str:
+    """Add a sticky note that is attached to an existing MIRO frame.
+
+    Args:
+        content: Text content of the sticky note.
+        frame_id: Id of the target frame (use create_miro_frame to obtain it).
+        color: Sticky note colour (yellow, blue, green, pink, violet, red, orange,
+               light_yellow, light_green, light_blue).
+        board_id: Target board id (defaults to configured board).
+
+    Returns:
+        New sticky note id, or an error message.
+    """
+    bid = _board_id(board_id)
+    url = f"{_MIRO_BASE}/boards/{bid}/sticky_notes"
+    payload = {
+        "data": {"content": content, "shape": "square"},
+        "style": {"fillColor": color},
+        "parent": {"id": frame_id},
+    }
+    try:
+        resp = requests.post(url, json=payload, headers=_headers(), timeout=15)
+        resp.raise_for_status()
+        return f"Sticky note created in frame {frame_id}. ID: {resp.json().get('id')}"
+    except Exception as exc:
+        return f"MIRO create sticky note in frame failed: {exc}"
+
+
 MIRO_TOOLS = [
     create_miro_board,
     get_miro_board,
@@ -201,4 +280,6 @@ MIRO_TOOLS = [
     update_sticky_note,
     delete_sticky_note,
     list_miro_items,
+    create_miro_frame,
+    create_sticky_note_in_frame,
 ]

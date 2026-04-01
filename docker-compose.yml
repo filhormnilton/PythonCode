@@ -1,0 +1,97 @@
+# ── Business Multi-Agent — docker-compose.yml ────────────────────────────────
+#
+# Usage:
+#   # Start Teams bot + optional Camunda
+#   docker compose up
+#
+#   # Start only the Teams bot
+#   docker compose up bot
+#
+#   # Build and start
+#   docker compose up --build
+#
+# Prerequisites:
+#   Copy .env.example → .env and fill in all credentials before running.
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+
+  # ── Business Multi-Agent Teams Bot ──────────────────────────────────────────
+  bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: business-multiagent:latest
+    container_name: business-bot
+    restart: unless-stopped
+
+    # Load credentials from .env file (git-ignored)
+    env_file: .env
+
+    # Override the Camunda URL to point at the Camunda service below (if used)
+    environment:
+      CAMUNDA_REST_URL: http://camunda:8080/engine-rest
+      BUSINESS_OUTPUT_DIR: /app/business_output
+
+    ports:
+      - "${TEAMS_PORT:-3978}:3978"
+
+    volumes:
+      # Persist generated documents, diagrams, and BPMN files
+      - business_output:/app/business_output
+
+    depends_on:
+      camunda:
+        condition: service_healthy
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3978/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  # ── Camunda BPM (optional — disable if you don't use BPMN features) ─────────
+  camunda:
+    image: camunda/camunda-bpm-platform:run-latest
+    container_name: business-camunda
+    restart: unless-stopped
+
+    environment:
+      # Enable H2 in-memory DB for development; switch to Postgres for production
+      - DB_DRIVER=org.h2.Driver
+      - DB_URL=jdbc:h2:./camunda-h2-database
+      - DB_USERNAME=sa
+      - DB_PASSWORD=
+
+    ports:
+      - "8080:8080"
+
+    volumes:
+      - camunda_data:/camunda/configuration/userlib
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/engine-rest/engine"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+
+volumes:
+  business_output:
+    driver: local
+  camunda_data:
+    driver: local

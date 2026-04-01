@@ -28,3 +28,7 @@ botbuilder-core>=4.16.0
 botbuilder-schema>=4.16.0
 botbuilder-integration-aiohttp>=4.16.0
 aiohttp>=3.10.0
+
+# ── Azure CosmosDB (optional — enables persistent conversation history) ────────
+# Required only when COSMOS_ENDPOINT and COSMOS_KEY environment variables are set.
+azure-cosmos>=4.7.0

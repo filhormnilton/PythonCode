@@ -2,6 +2,7 @@
 requests>=2.31.0
 pandas>=2.2.0
 openpyxl>=3.1.2
+python-dotenv>=1.0.0
 
 # ── Business Multi-Agent — LLM / LangChain core ───────────────────────────
 langchain>=0.3.0
@@ -23,7 +24,9 @@ jira>=3.8.0
 beautifulsoup4>=4.12.0
 tavily-python>=0.3.0
 
-# ── Business Multi-Agent — Microsoft Teams Bot ────────────────────────────
+# ── Business Multi-Agent — Charts (MCP: api_charts) ──────────────────────
+matplotlib>=3.8.0
+seaborn>=0.13.0
 botbuilder-core>=4.16.0
 botbuilder-schema>=4.16.0
 botbuilder-integration-aiohttp>=4.16.0

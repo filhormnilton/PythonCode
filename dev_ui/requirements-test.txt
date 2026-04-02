@@ -1,0 +1,5 @@
+# ⚠️  Dependências de TESTE apenas — não incluir no deploy de produção.
+# Instalar com: pip install -r dev_ui/requirements-test.txt
+
+fastapi>=0.111.0
+uvicorn>=0.29.0

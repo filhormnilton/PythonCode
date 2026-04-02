@@ -16,24 +16,112 @@ from Business.config import CONFIG
 _BPMN_NS = "http://www.omg.org/spec/BPMN/20100524/MODEL"
 _CAMUNDA_NS = "http://camunda.org/schema/1.0/bpmn"
 
-_BPMN_TEMPLATE = """\
-<?xml version="1.0" encoding="UTF-8"?>
+# Layout constants (Camunda Modeler compatible)
+_SHAPE_W = 100
+_SHAPE_H = 80
+_START_W = 36
+_START_H = 36
+_END_W = 36
+_END_H = 36
+_GAP = 50        # horizontal gap between elements
+_Y_CENTER = 200  # vertical center of the single lane
+
+
+def _build_bpmn_xml(process_id: str, process_name: str, steps: list[dict]) -> str:
+    """Generate BPMN 2.0 XML with full DI layout for Camunda Modeler.
+
+    Each step dict has keys: id, name, type  (startEvent|userTask|serviceTask|exclusiveGateway|endEvent)
+    """
+    # ---- sequence flows ----
+    seq_flows_xml = []
+    for i in range(len(steps) - 1):
+        sf_id = f"Flow_{i+1}"
+        seq_flows_xml.append(
+            f'    <sequenceFlow id="{sf_id}" sourceRef="{steps[i]["id"]}" targetRef="{steps[i+1]["id"]}"/>'
+        )
+
+    # ---- process elements ----
+    elems_xml = []
+    for s in steps:
+        t = s["type"]
+        eid = s["id"]
+        ename = s["name"]
+        if t == "startEvent":
+            elems_xml.append(f'    <startEvent id="{eid}" name="{ename}"/>')
+        elif t == "endEvent":
+            elems_xml.append(f'    <endEvent id="{eid}" name="{ename}"/>')
+        elif t == "exclusiveGateway":
+            elems_xml.append(f'    <exclusiveGateway id="{eid}" name="{ename}" gatewayDirection="Diverging"/>')
+        elif t == "serviceTask":
+            elems_xml.append(f'    <serviceTask id="{eid}" name="{ename}" camunda:type="external" camunda:topic="{eid}"/>')
+        else:  # userTask default
+            elems_xml.append(f'    <userTask id="{eid}" name="{ename}"/>')
+
+    # ---- DI shapes ----
+    x = 80
+    shape_xmls = []
+    edge_xmls = []
+    positions = {}  # id -> (cx, cy, w, h)
+
+    for s in steps:
+        t = s["type"]
+        eid = s["id"]
+        if t in ("startEvent", "endEvent"):
+            w, h = _START_W, _START_H
+        elif t == "exclusiveGateway":
+            w, h = 50, 50
+        else:
+            w, h = _SHAPE_W, _SHAPE_H
+        y = _Y_CENTER - h // 2
+        positions[eid] = (x, y, w, h)
+        shape_xmls.append(
+            f'      <bpmndi:BPMNShape id="{eid}_di" bpmnElement="{eid}">\n'
+            f'        <dc:Bounds x="{x}" y="{y}" width="{w}" height="{h}"/>\n'
+            f'      </bpmndi:BPMNShape>'
+        )
+        x += w + _GAP
+
+    for i in range(len(steps) - 1):
+        sf_id = f"Flow_{i+1}"
+        src = steps[i]["id"]
+        tgt = steps[i + 1]["id"]
+        sx, sy, sw, sh = positions[src]
+        tx, ty, tw, th = positions[tgt]
+        mid_src_x = sx + sw
+        mid_src_y = sy + sh // 2
+        mid_tgt_x = tx
+        mid_tgt_y = ty + th // 2
+        edge_xmls.append(
+            f'      <bpmndi:BPMNEdge id="{sf_id}_di" bpmnElement="{sf_id}">\n'
+            f'        <di:waypoint x="{mid_src_x}" y="{mid_src_y}"/>\n'
+            f'        <di:waypoint x="{mid_tgt_x}" y="{mid_tgt_y}"/>\n'
+            f'      </bpmndi:BPMNEdge>'
+        )
+
+    total_w = x + 80
+    total_h = _Y_CENTER + _SHAPE_H + 80
+
+    xml = f"""<?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
              xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
              xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
              targetNamespace="http://bpmn.io/schema/bpmn"
              id="Definitions_{process_id}">
   <process id="{process_id}" name="{process_name}" isExecutable="true">
-    <startEvent id="StartEvent_1" name="Start"/>
-    {tasks}
-    <endEvent id="EndEvent_1" name="End"/>
+{chr(10).join(elems_xml)}
+{chr(10).join(seq_flows_xml)}
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
-    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="{process_id}"/>
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="{process_id}">
+{chr(10).join(shape_xmls)}
+{chr(10).join(edge_xmls)}
+    </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
 </definitions>"""
+    return xml
 
 
 def _ensure_dir(directory: Path) -> None:
@@ -53,38 +141,53 @@ def _camunda_auth():
 # ---------------------------------------------------------------------------
 
 @tool
-def create_bpmn_process(filename: str, process_id: str, process_name: str, tasks: str) -> str:
-    """Create a new BPMN 2.0 process file.
+def create_bpmn_process(filename: str, process_id: str, process_name: str, steps: str) -> str:
+    """Create a BPMN 2.0 file ready to open in Camunda Modeler, with full visual layout.
 
     Args:
-        filename: Name of the output file (without extension).
-        process_id: BPMN process id (no spaces, e.g. 'order-processing').
-        process_name: Human-readable process name.
-        tasks: Newline-separated list of task names to add as UserTasks.
+        filename: Output filename without extension (e.g. 'scope-approval').
+        process_id: BPMN process id — no spaces (e.g. 'scope-approval').
+        process_name: Human-readable process name shown in Camunda Modeler.
+        steps: Newline-separated steps. Each line: "type:Label"
+            Supported types: startEvent, userTask, serviceTask, exclusiveGateway, endEvent
+            Example:
+                startEvent:Solicitação recebida
+                userTask:Análise Técnica
+                exclusiveGateway:Aprovado?
+                userTask:Execução
+                endEvent:Processo encerrado
 
     Returns:
-        Absolute path of the created .bpmn file.
+        Absolute path of the created .bpmn file (open with Camunda Modeler).
     """
     _ensure_dir(CONFIG.output.bpmn_dir)
     path = CONFIG.output.bpmn_dir / f"{filename}.bpmn"
 
-    task_xml_parts = []
-    for idx, task_name in enumerate(tasks.strip().splitlines(), start=1):
-        task_name = task_name.strip()
-        if not task_name:
+    step_list = []
+    for idx, line in enumerate(steps.strip().splitlines(), start=1):
+        line = line.strip()
+        if not line:
             continue
-        task_id = f"Task_{idx}"
-        task_xml_parts.append(
-            f'<userTask id="{task_id}" name="{task_name}" camunda:assignee="${{assignee}}"/>'
-        )
+        if ":" in line:
+            stype, sname = line.split(":", 1)
+            stype = stype.strip()
+            sname = sname.strip()
+        else:
+            stype, sname = "userTask", line
+        valid_types = {"startEvent", "userTask", "serviceTask", "exclusiveGateway", "endEvent"}
+        if stype not in valid_types:
+            stype = "userTask"
+        step_list.append({"id": f"Step_{idx}", "name": sname, "type": stype})
 
-    xml = _BPMN_TEMPLATE.format(
-        process_id=process_id,
-        process_name=process_name,
-        tasks="\n    ".join(task_xml_parts),
-    )
+    # Ensure always starts with startEvent and ends with endEvent
+    if not step_list or step_list[0]["type"] != "startEvent":
+        step_list.insert(0, {"id": "Step_0", "name": "Início", "type": "startEvent"})
+    if step_list[-1]["type"] != "endEvent":
+        step_list.append({"id": f"Step_{len(step_list)+1}", "name": "Fim", "type": "endEvent"})
+
+    xml = _build_bpmn_xml(process_id, process_name, step_list)
     path.write_text(xml, encoding="utf-8")
-    return str(path)
+    return f"BPMN file created: {path}\nOpen with Camunda Modeler to visualize and edit."
 
 
 @tool

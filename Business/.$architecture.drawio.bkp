@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" version="21.0.0" type="github">
+  <diagram name="Business MultiAgent Architecture">
+    <mxGraphModel dx="1800" dy="900" grid="1" gridSize="10" guides="1"
+                  tooltips="1" connect="1" arrows="1" fold="1" page="1"
+                  pageScale="1" pageWidth="1654" pageHeight="1169"
+                  math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <!-- TITLE                                                        -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <mxCell id="title" value="Business MultiAgent — LangChain Architecture"
+                style="text;html=1;strokeColor=none;fillColor=none;align=center;
+                       verticalAlign=middle;whiteSpace=wrap;rounded=0;
+                       fontSize=20;fontStyle=1;fontColor=#1a237e;"
+                vertex="1" parent="1">
+          <mxGeometry x="300" y="20" width="1050" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <!-- LAYER 0 — User / Microsoft Teams                            -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <mxCell id="layer0_bg" value="" style="swimlane;startSize=0;fillColor=#e3f2fd;strokeColor=#1565c0;
+                fontStyle=1;fontSize=11;horizontal=0;"
+                vertex="1" parent="1">
+          <mxGeometry x="30" y="90" width="1600" height="120" as="geometry"/>
+        </mxCell>
+        <mxCell id="layer0_label" value="USER / MICROSOFT TEAMS CHANNEL"
+                style="text;html=1;strokeColor=none;fillColor=none;align=center;
+                       verticalAlign=middle;fontStyle=1;fontSize=12;fontColor=#1565c0;"
+                vertex="1" parent="1">
+          <mxGeometry x="30" y="90" width="220" height="120" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="teams_user" value="👤 Usuário / Reunião Teams"
+                style="shape=mxgraph.azure.user;fillColor=#0288d1;strokeColor=#01579b;
+                       fontColor=#ffffff;fontStyle=1;fontSize=11;
+                       labelBackgroundColor=none;align=center;verticalLabelPosition=bottom;
+                       labelPosition=center;verticalAlign=top;"
+                vertex="1" parent="1">
+          <mxGeometry x="280" y="110" width="80" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="teams_channel" value="Microsoft Teams Bot&#xa;(Bot Framework Adapter)"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0288d1;strokeColor=#01579b;
+                       fontColor=#ffffff;fontStyle=1;fontSize=11;"
+                vertex="1" parent="1">
+          <mxGeometry x="450" y="130" width="220" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="teams_bot_srv" value="business/teams_bot/bot.py&#xa;POST /api/messages"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1565c0;strokeColor=#0d47a1;
+                       fontColor=#ffffff;fontStyle=1;fontSize=10;"
+                vertex="1" parent="1">
+          <mxGeometry x="760" y="130" width="220" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e_user_teams" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;
+                entryX=0;entryY=0.5;strokeColor=#1565c0;strokeWidth=2;"
+                edge="1" parent="1" source="teams_user" target="teams_channel">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_teams_bot" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;
+                entryX=0;entryY=0.5;strokeColor=#1565c0;strokeWidth=2;"
+                edge="1" parent="1" source="teams_channel" target="teams_bot_srv">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <!-- LAYER 1 — Orchestrator                                       -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <mxCell id="layer1_bg" value="" style="swimlane;startSize=0;fillColor=#fce4ec;strokeColor=#c62828;
+                fontStyle=1;fontSize=11;horizontal=0;"
+                vertex="1" parent="1">
+          <mxGeometry x="30" y="240" width="1600" height="140" as="geometry"/>
+        </mxCell>
+        <mxCell id="layer1_label" value="ORCHESTRATOR LAYER"
+                style="text;html=1;strokeColor=none;fillColor=none;align=center;
+                       verticalAlign=middle;fontStyle=1;fontSize=12;fontColor=#c62828;"
+                vertex="1" parent="1">
+          <mxGeometry x="30" y="240" width="220" height="140" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="orchestrator" value="🧠 Chief Business Architect&#xa;'frysda' / 'Negócios'&#xa;&#xa;business/orchestrator/chief_architect.py&#xa;LangChain AgentExecutor + Tool Calling"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#c62828;strokeColor=#b71c1c;
+                       fontColor=#ffffff;fontStyle=1;fontSize=11;arcSize=10;"
+                vertex="1" parent="1">
+          <mxGeometry x="590" y="265" width="480" height="90" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e_bot_orch" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;
+                entryX=0.5;entryY=0;strokeColor=#c62828;strokeWidth=2;"
+                edge="1" parent="1" source="teams_bot_srv" target="orchestrator">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <!-- LAYER 2 — Specialist Agents                                  -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <mxCell id="layer2_bg" value="" style="swimlane;startSize=0;fillColor=#f3e5f5;strokeColor=#6a1b9a;
+                fontStyle=1;fontSize=11;horizontal=0;"
+                vertex="1" parent="1">
+          <mxGeometry x="30" y="410" width="1600" height="200" as="geometry"/>
+        </mxCell>
+        <mxCell id="layer2_label" value="SPECIALIST AGENTS LAYER"
+                style="text;html=1;strokeColor=none;fillColor=none;align=center;
+                       verticalAlign=middle;fontStyle=1;fontSize=12;fontColor=#6a1b9a;"
+                vertex="1" parent="1">
+          <mxGeometry x="30" y="410" width="220" height="200" as="geometry"/>
+        </mxCell>
+
+        <!-- Agent boxes -->
+        <mxCell id="ag_docs" value="📄 1_DOCS&#xa;docs_agent.py&#xa;Word · PDF · TXT"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#7b1fa2;strokeColor=#4a148c;
+                       fontColor=#ffffff;fontStyle=1;fontSize=10;arcSize=15;"
+                vertex="1" parent="1">
+          <mxGeometry x="260" y="435" width="160" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="ag_slides" value="📊 2_SLIDES&#xa;slides_agent.py&#xa;PowerPoint"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#7b1fa2;strokeColor=#4a148c;
+                       fontColor=#ffffff;fontStyle=1;fontSize=10;arcSize=15;"
+                vertex="1" parent="1">
+          <mxGeometry x="440" y="435" width="160" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="ag_arch" value="🏗️ 3_ARCHITECT&#xa;architect_agent.py&#xa;Draw.io"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#7b1fa2;strokeColor=#4a148c;
+                       fontColor=#ffffff;fontStyle=1;fontSize=10;arcSize=15;"
+                vertex="1" parent="1">
+          <mxGeometry x="620" y="435" width="160" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="ag_jira" value="🎯 4_JIRA&#xa;jira_agent.py&#xa;Backlog"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#7b1fa2;strokeColor=#4a148c;
+                       fontColor=#ffffff;fontStyle=1;fontSize=10;arcSize=15;"
+                vertex="1" parent="1">
+          <mxGeometry x="800" y="435" width="160" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="ag_web" value="🌐 5_WEB&#xa;web_agent.py&#xa;Research"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#7b1fa2;strokeColor=#4a148c;
+                       fontColor=#ffffff;fontStyle=1;fontSize=10;arcSize=15;"
+                vertex="1" parent="1">
+          <mxGeometry x="980" y="435" width="160" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="ag_process" value="⚙️ 6_PROCESS&#xa;process_agent.py&#xa;BPMN / Camunda"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#7b1fa2;strokeColor=#4a148c;
+                       fontColor=#ffffff;fontStyle=1;fontSize=10;arcSize=15;"
+                vertex="1" parent="1">
+          <mxGeometry x="1160" y="435" width="160" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="ag_miro" value="🗂️ 7_MIRO&#xa;miro_agent.py&#xa;Boards"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#7b1fa2;strokeColor=#4a148c;
+                       fontColor=#ffffff;fontStyle=1;fontSize=10;arcSize=15;"
+                vertex="1" parent="1">
+          <mxGeometry x="1340" y="435" width="160" height="80" as="geometry"/>
+        </mxCell>
+
+        <!-- Edges: Orchestrator → Agents -->
+        <mxCell id="e_o_docs"    style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#7b1fa2;strokeWidth=1.5;" edge="1" parent="1" source="orchestrator" target="ag_docs">    <mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_o_slides"  style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#7b1fa2;strokeWidth=1.5;" edge="1" parent="1" source="orchestrator" target="ag_slides">  <mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_o_arch"    style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#7b1fa2;strokeWidth=1.5;" edge="1" parent="1" source="orchestrator" target="ag_arch">    <mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_o_jira"    style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#7b1fa2;strokeWidth=1.5;" edge="1" parent="1" source="orchestrator" target="ag_jira">    <mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_o_web"     style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#7b1fa2;strokeWidth=1.5;" edge="1" parent="1" source="orchestrator" target="ag_web">     <mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_o_process" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#7b1fa2;strokeWidth=1.5;" edge="1" parent="1" source="orchestrator" target="ag_process"> <mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_o_miro"    style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#7b1fa2;strokeWidth=1.5;" edge="1" parent="1" source="orchestrator" target="ag_miro">    <mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <!-- LAYER 3 — MCP Tools                                          -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <mxCell id="layer3_bg" value="" style="swimlane;startSize=0;fillColor=#e8f5e9;strokeColor=#1b5e20;
+                fontStyle=1;fontSize=11;horizontal=0;"
+                vertex="1" parent="1">
+          <mxGeometry x="30" y="640" width="1600" height="200" as="geometry"/>
+        </mxCell>
+        <mxCell id="layer3_label" value="MCP TOOLS LAYER"
+                style="text;html=1;strokeColor=none;fillColor=none;align=center;
+                       verticalAlign=middle;fontStyle=1;fontSize=12;fontColor=#1b5e20;"
+                vertex="1" parent="1">
+          <mxGeometry x="30" y="640" width="220" height="200" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="mcp_docs" value="api_office_pdf&#xa;python-docx&#xa;reportlab · pdfplumber"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#388e3c;strokeColor=#1b5e20;
+                       fontColor=#ffffff;fontSize=10;arcSize=20;"
+                vertex="1" parent="1">
+          <mxGeometry x="260" y="665" width="160" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="mcp_pptx" value="api_powerpoint&#xa;python-pptx"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#388e3c;strokeColor=#1b5e20;
+                       fontColor=#ffffff;fontSize=10;arcSize=20;"
+                vertex="1" parent="1">
+          <mxGeometry x="440" y="665" width="160" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="mcp_drawio" value="api_drawio&#xa;xml.etree (stdlib)"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#388e3c;strokeColor=#1b5e20;
+                       fontColor=#ffffff;fontSize=10;arcSize=20;"
+                vertex="1" parent="1">
+          <mxGeometry x="620" y="665" width="160" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="mcp_jira" value="api_jira&#xa;jira (PyPI)"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#388e3c;strokeColor=#1b5e20;
+                       fontColor=#ffffff;fontSize=10;arcSize=20;"
+                vertex="1" parent="1">
+          <mxGeometry x="800" y="665" width="160" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="mcp_web" value="api_web&#xa;requests · bs4&#xa;tavily-python"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#388e3c;strokeColor=#1b5e20;
+                       fontColor=#ffffff;fontSize=10;arcSize=20;"
+                vertex="1" parent="1">
+          <mxGeometry x="980" y="665" width="160" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="mcp_camunda" value="api_camunda&#xa;Camunda REST API&#xa;xml.etree (stdlib)"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#388e3c;strokeColor=#1b5e20;
+                       fontColor=#ffffff;fontSize=10;arcSize=20;"
+                vertex="1" parent="1">
+          <mxGeometry x="1160" y="665" width="160" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="mcp_miro" value="api_miro&#xa;MIRO REST API v2"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#388e3c;strokeColor=#1b5e20;
+                       fontColor=#ffffff;fontSize=10;arcSize=20;"
+                vertex="1" parent="1">
+          <mxGeometry x="1340" y="665" width="160" height="80" as="geometry"/>
+        </mxCell>
+
+        <!-- Edges: Agents → MCP -->
+        <mxCell id="e_a1_m1" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#388e3c;strokeWidth=1.5;" edge="1" parent="1" source="ag_docs"    target="mcp_docs">    <mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_a2_m2" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#388e3c;strokeWidth=1.5;" edge="1" parent="1" source="ag_slides"  target="mcp_pptx">    <mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_a3_m3" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#388e3c;strokeWidth=1.5;" edge="1" parent="1" source="ag_arch"    target="mcp_drawio">  <mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_a4_m4" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#388e3c;strokeWidth=1.5;" edge="1" parent="1" source="ag_jira"    target="mcp_jira">    <mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_a5_m5" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#388e3c;strokeWidth=1.5;" edge="1" parent="1" source="ag_web"     target="mcp_web">     <mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_a6_m6" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#388e3c;strokeWidth=1.5;" edge="1" parent="1" source="ag_process" target="mcp_camunda"> <mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_a7_m7" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#388e3c;strokeWidth=1.5;" edge="1" parent="1" source="ag_miro"    target="mcp_miro">    <mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <!-- LAYER 4 — External Systems                                   -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <mxCell id="layer4_bg" value="" style="swimlane;startSize=0;fillColor=#fff8e1;strokeColor=#f57f17;
+                fontStyle=1;fontSize=11;horizontal=0;"
+                vertex="1" parent="1">
+          <mxGeometry x="30" y="870" width="1600" height="180" as="geometry"/>
+        </mxCell>
+        <mxCell id="layer4_label" value="EXTERNAL SYSTEMS"
+                style="text;html=1;strokeColor=none;fillColor=none;align=center;
+                       verticalAlign=middle;fontStyle=1;fontSize=12;fontColor=#f57f17;"
+                vertex="1" parent="1">
+          <mxGeometry x="30" y="870" width="220" height="180" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="ext_word" value="📝 Microsoft Word&#xa;/ Local filesystem"
+                style="shape=mxgraph.office.files.word_document;fillColor=#2e7d32;strokeColor=#1b5e20;
+                       fontColor=#ffffff;fontSize=10;align=center;
+                       verticalLabelPosition=bottom;labelPosition=center;verticalAlign=top;"
+                vertex="1" parent="1">
+          <mxGeometry x="290" y="900" width="80" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="ext_pptx" value="📊 PowerPoint"
+                style="shape=mxgraph.office.files.powerpoint_document;fillColor=#c62828;
+                       strokeColor=#b71c1c;fontColor=#ffffff;fontSize=10;align=center;
+                       verticalLabelPosition=bottom;labelPosition=center;verticalAlign=top;"
+                vertex="1" parent="1">
+          <mxGeometry x="470" y="900" width="80" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="ext_drawio" value="🖼️ Draw.io&#xa;(diagrams.net)"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e65100;strokeColor=#bf360c;
+                       fontColor=#ffffff;fontSize=10;"
+                vertex="1" parent="1">
+          <mxGeometry x="640" y="910" width="120" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="ext_jira" value="🎯 Atlassian JIRA"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0052cc;strokeColor=#003e99;
+                       fontColor=#ffffff;fontStyle=1;fontSize=10;"
+                vertex="1" parent="1">
+          <mxGeometry x="820" y="910" width="120" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="ext_web" value="🌐 Internet&#xa;(Tavily / DDG)"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#01579b;strokeColor=#003c6e;
+                       fontColor=#ffffff;fontSize=10;"
+                vertex="1" parent="1">
+          <mxGeometry x="1000" y="910" width="120" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="ext_camunda" value="⚙️ Camunda 7&#xa;REST Engine"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#6d4c41;strokeColor=#4e342e;
+                       fontColor=#ffffff;fontSize=10;"
+                vertex="1" parent="1">
+          <mxGeometry x="1180" y="910" width="120" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="ext_miro" value="🗂️ MIRO&#xa;REST API v2"
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffd600;strokeColor=#f9a825;
+                       fontColor=#000000;fontStyle=1;fontSize=10;"
+                vertex="1" parent="1">
+          <mxGeometry x="1360" y="910" width="120" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- Edges: MCP → External -->
+        <mxCell id="e_m1_e1" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#f57f17;strokeWidth=1.5;" edge="1" parent="1" source="mcp_docs"    target="ext_word">    <mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_m2_e2" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#f57f17;strokeWidth=1.5;" edge="1" parent="1" source="mcp_pptx"    target="ext_pptx">    <mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_m3_e3" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#f57f17;strokeWidth=1.5;" edge="1" parent="1" source="mcp_drawio"  target="ext_drawio">  <mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_m4_e4" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#f57f17;strokeWidth=1.5;" edge="1" parent="1" source="mcp_jira"    target="ext_jira">    <mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_m5_e5" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#f57f17;strokeWidth=1.5;" edge="1" parent="1" source="mcp_web"     target="ext_web">     <mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_m6_e6" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#f57f17;strokeWidth=1.5;" edge="1" parent="1" source="mcp_camunda" target="ext_camunda"> <mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_m7_e7" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#f57f17;strokeWidth=1.5;" edge="1" parent="1" source="mcp_miro"    target="ext_miro">    <mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <!-- LEGEND                                                        -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <mxCell id="legend_bg" value="" style="rounded=1;whiteSpace=wrap;html=1;
+                fillColor=#fafafa;strokeColor=#bdbdbd;fontSize=10;"
+                vertex="1" parent="1">
+          <mxGeometry x="30" y="1075" width="520" height="160" as="geometry"/>
+        </mxCell>
+        <mxCell id="legend_title" value="Legend"
+                style="text;html=1;strokeColor=none;fillColor=none;align=left;
+                       fontStyle=1;fontSize=12;"
+                vertex="1" parent="1">
+          <mxGeometry x="50" y="1085" width="100" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="leg1" value="🔵 User / Teams Channel"
+                style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="50" y="1110" width="220" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="leg2" value="🔴 Orchestrator (Chief Architect)"
+                style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="50" y="1130" width="220" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="leg3" value="🟣 Specialist Agents (LangChain AgentExecutor)"
+                style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="50" y="1150" width="280" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="leg4" value="🟢 MCP Tools (LangChain @tool wrappers)"
+                style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="50" y="1170" width="280" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="leg5" value="🟡 External Systems / APIs"
+                style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="50" y="1190" width="220" height="20" as="geometry"/>
+        </mxCell>
+
+        <!-- MODES TABLE -->
+        <mxCell id="modes_bg" value="" style="rounded=1;whiteSpace=wrap;html=1;
+                fillColor=#fafafa;strokeColor=#bdbdbd;"
+                vertex="1" parent="1">
+          <mxGeometry x="600" y="1075" width="1030" height="160" as="geometry"/>
+        </mxCell>
+        <mxCell id="modes_content" value="&lt;b&gt;Execution Modes (Orchestrator Routes)&lt;/b&gt;&lt;br/&gt;&lt;table border='1' cellpadding='4' style='border-collapse:collapse;font-size:10px'&gt;&lt;tr&gt;&lt;th&gt;Mode&lt;/th&gt;&lt;th&gt;Operation&lt;/th&gt;&lt;th&gt;Agents Activated&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;1&lt;/td&gt;&lt;td&gt;Engenharia de User Story&lt;/td&gt;&lt;td&gt;JIRA + DOCS&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;2&lt;/td&gt;&lt;td&gt;Auditoria Heurística&lt;/td&gt;&lt;td&gt;JIRA + MIRO + SLIDES&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;3&lt;/td&gt;&lt;td&gt;Discovery &amp;amp; Arquitetura&lt;/td&gt;&lt;td&gt;WEB + PROCESS + ARCHITECT&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;4&lt;/td&gt;&lt;td&gt;Gestão de Mudança em Massa&lt;/td&gt;&lt;td&gt;JIRA + DOCS + PROCESS&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;5&lt;/td&gt;&lt;td&gt;Ad-hoc Orchestration&lt;/td&gt;&lt;td&gt;Intelligent routing by demand&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;"
+                style="text;html=1;strokeColor=none;fillColor=none;align=left;
+                       verticalAlign=top;fontSize=10;"
+                vertex="1" parent="1">
+          <mxGeometry x="610" y="1080" width="1010" height="150" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

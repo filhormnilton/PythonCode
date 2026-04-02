@@ -5,6 +5,7 @@ All sensitive values are read from environment variables.
 import os
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import List
 
 
 @dataclass(frozen=True)
@@ -20,7 +21,18 @@ class JiraConfig:
     server: str = field(default_factory=lambda: os.getenv("JIRA_SERVER", "https://your-domain.atlassian.net"))
     user: str = field(default_factory=lambda: os.getenv("JIRA_USER", ""))
     api_token: str = field(default_factory=lambda: os.getenv("JIRA_API_TOKEN", ""))
-    project_key: str = field(default_factory=lambda: os.getenv("JIRA_PROJECT_KEY", "PROJ"))
+    project_keys: List[str] = field(
+        default_factory=lambda: [
+            k.strip()
+            for k in os.getenv("JIRA_PROJECT_KEY", "PROJ").split(",")
+            if k.strip()
+        ]
+    )
+
+    @property
+    def project_key(self) -> str:
+        """Return the first (default) project key."""
+        return self.project_keys[0] if self.project_keys else ""
 
 
 @dataclass(frozen=True)
@@ -63,7 +75,8 @@ class OutputConfig:
 
     @property
     def diagrams_dir(self) -> Path:
-        return self.base_dir / "diagrams"
+        override = os.getenv("DRAWIO_OUTPUT_DIR", "").strip()
+        return Path(override) if override else self.base_dir / "diagrams"
 
     @property
     def bpmn_dir(self) -> Path:

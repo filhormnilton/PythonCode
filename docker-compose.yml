@@ -71,7 +71,7 @@ services:
       - DB_PASSWORD=
 
     ports:
-      - "8080:8080"
+      - "8999:8080"
 
     volumes:
       - camunda_data:/camunda/configuration/userlib

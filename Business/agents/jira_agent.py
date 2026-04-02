@@ -18,6 +18,14 @@ _SYSTEM_PROMPT = """\
 - integration: "Mapear campos customizados JIRA para [Atributo Obsoleto] e [UR]."
 - workflow: "Transição automática de status baseada na 'Liberação para Revisão' de [Negócios]."
 
+## [SEARCH_RULES — CRITICAL]
+- ALWAYS use max_results=100 (or higher when listing all issues of a project).
+- For "list all" or "listar todas" requests, use max_results=500.
+- JQL for all issues of a project: project=ORC ORDER BY created DESC
+- JQL for filtering: project=ORC AND summary ~ "keyword" ORDER BY created DESC
+- NEVER cap results at 20 — the default is 100 but override as needed.
+- After searching, return the COMPLETE list. Do NOT summarize or truncate.
+
 ## [PRECISION]
 - rule: "Zero duplicação. Verificar existência de Issue ID antes da criação."
 
@@ -34,6 +42,7 @@ _SYSTEM_PROMPT = """\
 - Add structured comments to issues for traceability.
 - Manage sprints: list existing sprints, create new sprints, and assign issues to sprints.
 - Always confirm the issue key after every create or update operation.
+- Return results as a Markdown table: | Issue | Tipo | Status | Resumo |
 """
 
 

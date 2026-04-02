@@ -29,6 +29,7 @@ def create_jira_issue(
     issue_type: str = "Story",
     priority: str = "Medium",
     labels: str = "",
+    project_key: str = "",
 ) -> str:
     """Create a new JIRA issue (Story, Task, Bug, Epic, etc.).
 
@@ -38,6 +39,7 @@ def create_jira_issue(
         issue_type: JIRA issue type (Story, Task, Bug, Epic, Sub-task).
         priority: Priority level (Highest, High, Medium, Low, Lowest).
         labels: Comma-separated list of labels.
+        project_key: JIRA project key (defaults to first configured project).
 
     Returns:
         Created issue key (e.g. 'PROJ-42').
@@ -48,7 +50,7 @@ def create_jira_issue(
 
     label_list = [l.strip() for l in labels.split(",") if l.strip()]
     issue_dict = {
-        "project": {"key": CONFIG.jira.project_key},
+        "project": {"key": project_key or CONFIG.jira.project_key},
         "summary": summary,
         "description": description,
         "issuetype": {"name": issue_type},
@@ -142,13 +144,27 @@ def delete_jira_issue(issue_key: str) -> str:
     return f"Issue {issue_key} deleted."
 
 
+def _resolve_account_id(jira, email: str) -> str:
+    """Resolve a Jira Cloud accountId from an email address."""
+    try:
+        users = jira.search_users(query=email)
+        for u in users:
+            if getattr(u, "emailAddress", "").lower() == email.lower():
+                return u.accountId
+        if users:
+            return users[0].accountId
+    except Exception as exc:
+        logger.warning("[JIRA] Could not resolve accountId for %s: %s", email, exc)
+    return email  # fall back to raw email
+
+
 @tool
-def search_jira_issues(jql: str, max_results: int = 20) -> str:
+def search_jira_issues(jql: str, max_results: int = 100) -> str:
     """Search JIRA issues using JQL.
 
     Args:
         jql: JQL query string (e.g. 'project=PROJ AND status="To Do"').
-        max_results: Maximum number of results to return.
+        max_results: Maximum number of results to return (default 100, max 500).
 
     Returns:
         Newline-separated list of matching issue keys and summaries.
@@ -156,6 +172,21 @@ def search_jira_issues(jql: str, max_results: int = 20) -> str:
     jira = _client()
     if jira is None:
         return "ERROR: jira library not installed."
+
+    # Replace email addresses in JQL with Jira Cloud accountId
+    import re as _re
+    emails_found = _re.findall(
+        r'=\s*["\']?([A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,})["\']?',
+        jql,
+    )
+    for email in emails_found:
+        account_id = _resolve_account_id(jira, email)
+        # Replace the raw email (with or without quotes) by accountId in quotes
+        jql = _re.sub(
+            r'=\s*["\']?' + _re.escape(email) + r'["\']?',
+            f'= "{account_id}"',
+            jql,
+        )
 
     issues = jira.search_issues(jql, maxResults=max_results)
     if not issues:
@@ -303,12 +334,57 @@ def assign_issue_to_sprint(issue_key: str, sprint_id: str) -> str:
         return f"ERROR assigning issue to sprint: {exc}"
 
 
+@tool
+def get_my_issues(
+    project_key: str = "",
+    status: str = "",
+    max_results: int = 50,
+) -> str:
+    """List JIRA issues assigned to the currently configured user (currentUser()).
+
+    Uses Jira's currentUser() function — the most reliable way to find issues
+    assigned to the authenticated user regardless of email/accountId format.
+
+    Args:
+        project_key: Optional project key to filter (e.g. 'ORC'). Leave empty for all projects.
+        status: Optional status filter (e.g. 'In Progress', 'To Do'). Leave empty for all.
+        max_results: Maximum number of results to return.
+
+    Returns:
+        Formatted list of issues.
+    """
+    jira = _client()
+    if jira is None:
+        return "ERROR: jira library not installed."
+
+    conditions = ["assignee = currentUser()"]
+    if project_key:
+        conditions.append(f'project = "{project_key}"')
+    if status:
+        conditions.append(f'status = "{status}"')
+    jql = " AND ".join(conditions) + " ORDER BY updated DESC"
+
+    try:
+        issues = jira.search_issues(jql, maxResults=max_results)
+        if not issues:
+            return "No issues found assigned to you."
+        lines = []
+        for i in issues:
+            assignee = getattr(i.fields.assignee, "displayName", "Unassigned") if i.fields.assignee else "Unassigned"
+            status_name = getattr(i.fields.status, "name", "?")
+            lines.append(f"{i.key} [{status_name}]: {i.fields.summary}")
+        return "\n".join(lines)
+    except Exception as exc:
+        return f"ERROR searching issues: {exc}"
+
+
 JIRA_TOOLS = [
     create_jira_issue,
     get_jira_issue,
     update_jira_issue,
     delete_jira_issue,
     search_jira_issues,
+    get_my_issues,
     add_comment_to_issue,
     get_project_backlog,
     list_sprints,

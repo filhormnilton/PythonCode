@@ -11,6 +11,7 @@ from typing import Any, List, Optional
 
 from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.tools import BaseTool
+from langgraph.prebuilt import create_react_agent
 
 logger = logging.getLogger(__name__)
 
@@ -79,11 +80,9 @@ def build_agent(
     Returns:
         AgentWrapper ready to invoke.
     """
-    from langchain.agents import create_agent
-
-    graph = create_agent(
+    graph = create_react_agent(
         model=llm,
         tools=tools,
-        system_prompt=system_prompt,
+        prompt=system_prompt,
     )
     return AgentWrapper(graph, agent_name)

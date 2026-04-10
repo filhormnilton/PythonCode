@@ -30,16 +30,25 @@ def create_jira_issue(
     priority: str = "Medium",
     labels: str = "",
     project_key: str = "",
+    team_id: str = "",
+    story_points: float = 0,
+    epic_link: str = "",
+    parent_key: str = "",
 ) -> str:
-    """Create a new JIRA issue (Story, Task, Bug, Epic, etc.).
+    """Create a new JIRA issue (Story, Task, Bug, Epic, Sub-task).
 
     Args:
         summary: Issue title following the pattern '[ID] | ENTITY | ACTION | CONTEXT'.
-        description: Full description with acceptance criteria.
+        description: Full description with acceptance criteria (JIRA wiki markup supported).
         issue_type: JIRA issue type (Story, Task, Bug, Epic, Sub-task).
         priority: Priority level (Highest, High, Medium, Low, Lowest).
         labels: Comma-separated list of labels.
         project_key: JIRA project key (defaults to first configured project).
+        team_id: Numeric Team ID (required when the project enforces a Team field).
+                 Falls back to JIRA_TEAM_ID env var when omitted.
+        story_points: Story point estimate (Fibonacci: 1, 2, 3, 5, 8, 13). 0 = not set.
+        epic_link: Epic key to link this story to (classic JIRA, e.g. 'ORC-10').
+        parent_key: Parent issue key (next-gen projects / sub-tasks).
 
     Returns:
         Created issue key (e.g. 'PROJ-42').
@@ -59,8 +68,34 @@ def create_jira_issue(
     if label_list:
         issue_dict["labels"] = label_list
 
-    issue = jira.create_issue(fields=issue_dict)
-    return str(issue.key)
+    resolved_team_id = team_id or CONFIG.jira.team_id
+    if resolved_team_id:
+        # Jira Cloud Advanced Roadmaps: team UUID passed as a plain string value
+        issue_dict["customfield_10001"] = str(resolved_team_id)
+
+    if story_points and story_points > 0:
+        # customfield_10016 = Story Points in most JIRA Cloud instances
+        issue_dict["customfield_10016"] = story_points
+        issue_dict["story_points"] = story_points  # fallback for some configs
+
+    if parent_key:
+        issue_dict["parent"] = {"key": parent_key}
+    elif epic_link:
+        # Classic JIRA: customfield_10008 / Next-gen: parent field
+        issue_dict["customfield_10008"] = epic_link
+
+    try:
+        issue = jira.create_issue(fields=issue_dict)
+        return str(issue.key)
+    except Exception as exc:
+        error_msg = str(exc)
+        if "Team" in error_msg or "customfield_10001" in error_msg:
+            return (
+                f"ERROR ao criar issue no JIRA: {error_msg}\n"
+                "Dica: configure JIRA_TEAM_ID no .env com o ID numérico do seu Team "
+                "(visível em: JIRA > Project Settings > Teams, ou no URL do team)."
+            )
+        return f"ERROR ao criar issue no JIRA: {error_msg}"
 
 
 @tool
@@ -159,12 +194,14 @@ def _resolve_account_id(jira, email: str) -> str:
 
 
 @tool
-def search_jira_issues(jql: str, max_results: int = 100) -> str:
+def search_jira_issues(jql: str, max_results: int = 0) -> str:
     """Search JIRA issues using JQL.
 
     Args:
         jql: JQL query string (e.g. 'project=PROJ AND status="To Do"').
-        max_results: Maximum number of results to return (default 100, max 500).
+        max_results: Maximum number of results to return. Capped at 50 to prevent
+                 hanging on large projects. Use keyword-filtered JQL instead of
+                 fetching all issues.
 
     Returns:
         Newline-separated list of matching issue keys and summaries.
@@ -181,14 +218,19 @@ def search_jira_issues(jql: str, max_results: int = 100) -> str:
     )
     for email in emails_found:
         account_id = _resolve_account_id(jira, email)
-        # Replace the raw email (with or without quotes) by accountId in quotes
         jql = _re.sub(
             r'=\s*["\']?' + _re.escape(email) + r'["\']?',
             f'= "{account_id}"',
             jql,
         )
 
-    issues = jira.search_issues(jql, maxResults=max_results)
+    # When max_results=0, paginate and fetch all results (may be slow on large projects;
+    # always use keyword-filtered JQL to avoid timeouts).
+    limit = False if max_results == 0 else max_results
+    try:
+        issues = jira.search_issues(jql, maxResults=limit)
+    except Exception as exc:
+        return f"Search failed: {exc}. Proceed without duplicate check."
     if not issues:
         return "No issues found."
     return "\n".join(f"{i.key}: {i.fields.summary}" for i in issues)
@@ -214,12 +256,12 @@ def add_comment_to_issue(issue_key: str, comment: str) -> str:
 
 
 @tool
-def get_project_backlog(project_key: str = "", max_results: int = 50) -> str:
-    """Retrieve the backlog (open issues) for a JIRA project.
+def get_project_backlog(project_key: str = "", max_results: int = 0) -> str:
+    """Retrieve ALL issues for a JIRA project.
 
     Args:
         project_key: JIRA project key (defaults to configured project).
-        max_results: Maximum number of issues to return.
+        max_results: Maximum number of issues to return. 0 (default) returns ALL issues.
 
     Returns:
         Formatted backlog list.
@@ -229,8 +271,9 @@ def get_project_backlog(project_key: str = "", max_results: int = 50) -> str:
         return "ERROR: jira library not installed."
 
     key = project_key or CONFIG.jira.project_key
-    jql = f'project="{key}" AND statusCategory != Done ORDER BY created DESC'
-    issues = jira.search_issues(jql, maxResults=max_results)
+    jql = f'project="{key}" ORDER BY created DESC'
+    limit = False if max_results == 0 else max_results
+    issues = jira.search_issues(jql, maxResults=limit)
     if not issues:
         return "Backlog is empty."
     lines = [f"{i.key} [{i.fields.issuetype.name}] {i.fields.summary}" for i in issues]
@@ -378,8 +421,89 @@ def get_my_issues(
         return f"ERROR searching issues: {exc}"
 
 
+@tool
+def create_complete_story(
+    summary: str,
+    description: str,
+    priority: str = "Medium",
+    labels: str = "",
+    project_key: str = "",
+    team_id: str = "",
+    story_points: float = 0,
+    epic_link: str = "",
+    subtasks: str = "",
+) -> str:
+    """Create a full User Story with optional sub-tasks in a single operation.
+
+    Use this tool for engineering-grade stories (points >= 5) that need decomposition
+    into sub-tasks. Creates the parent story first, then all sub-tasks linked to it.
+
+    Args:
+        summary: Story title following '[ID] | ENTITY | ACTION | CONTEXT'.
+        description: Full rich description in JIRA wiki markup (narrative, AC, NFR, DoD, etc.).
+        priority: Priority level (Highest, High, Medium, Low, Lowest).
+        labels: Comma-separated labels.
+        project_key: JIRA project key (defaults to configured project).
+        team_id: Team ID — falls back to JIRA_TEAM_ID env var.
+        story_points: Story point estimate (Fibonacci: 1, 2, 3, 5, 8, 13). 0 = not set.
+        epic_link: Epic key to link this story to (e.g. 'ORC-10').
+        subtasks: Pipe-separated list of sub-task summaries to create under this story.
+                  Example: "Backend API endpoint|Frontend component|Unit tests|Docs update"
+                  Leave empty to skip sub-task creation.
+
+    Returns:
+        Created story key and list of sub-task keys.
+    """
+    # 1. Create the parent story
+    story_key = create_jira_issue.invoke({
+        "summary": summary,
+        "description": description,
+        "issue_type": "Story",
+        "priority": priority,
+        "labels": labels,
+        "project_key": project_key,
+        "team_id": team_id,
+        "story_points": story_points,
+        "epic_link": epic_link,
+    })
+
+    if story_key.startswith("ERROR"):
+        return story_key
+
+    results = [f"Story created: {story_key}"]
+
+    # 2. Create sub-tasks if provided
+    if subtasks:
+        task_summaries = [t.strip() for t in subtasks.split("|") if t.strip()]
+        created_subtasks = []
+        failed_subtasks = []
+        for task_summary in task_summaries:
+            sub_key = create_jira_issue.invoke({
+                "summary": task_summary,
+                "description": f"Sub-task of [{story_key}]\n\n{task_summary}",
+                "issue_type": "Sub-task",
+                "priority": priority,
+                "labels": labels,
+                "project_key": project_key or CONFIG.jira.project_key,
+                "team_id": team_id,
+                "parent_key": story_key,
+            })
+            if sub_key.startswith("ERROR"):
+                failed_subtasks.append(f"{task_summary}: {sub_key}")
+            else:
+                created_subtasks.append(sub_key)
+
+        if created_subtasks:
+            results.append(f"Sub-tasks created: {', '.join(created_subtasks)}")
+        if failed_subtasks:
+            results.append(f"Sub-tasks failed:\n" + "\n".join(failed_subtasks))
+
+    return "\n".join(results)
+
+
 JIRA_TOOLS = [
     create_jira_issue,
+    create_complete_story,
     get_jira_issue,
     update_jira_issue,
     delete_jira_issue,

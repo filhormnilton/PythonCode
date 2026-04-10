@@ -35,3 +35,7 @@ aiohttp>=3.10.0
 # ── Azure CosmosDB (optional — enables persistent conversation history) ────────
 # Required only when COSMOS_ENDPOINT and COSMOS_KEY environment variables are set.
 azure-cosmos>=4.7.0
+
+# ── REST API server (api_server.py) ───────────────────────────────────────────
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0

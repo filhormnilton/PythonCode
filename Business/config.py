@@ -28,6 +28,7 @@ class JiraConfig:
             if k.strip()
         ]
     )
+    team_id: str = field(default_factory=lambda: os.getenv("JIRA_TEAM_ID", ""))
 
     @property
     def project_key(self) -> str:

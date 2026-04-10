@@ -1,14 +1,12 @@
 # ── Business Multi-Agent — docker-compose.yml ────────────────────────────────
 #
+# Single service: the api_server.py REST API + Teams Bot Framework webhook.
+# The Microsoft Teams UI is the frontend — there is no web frontend in this app.
+#
 # Usage:
-#   # Start Teams bot + optional Camunda
-#   docker compose up
-#
-#   # Start only the Teams bot
-#   docker compose up bot
-#
-#   # Build and start
-#   docker compose up --build
+#   docker compose up --build          # build and start
+#   docker compose up                  # start (image already built)
+#   docker compose down                # stop
 #
 # Prerequisites:
 #   Copy .env.example → .env and fill in all credentials before running.
@@ -16,25 +14,25 @@
 
 services:
 
-  # ── Business Multi-Agent Teams Bot ──────────────────────────────────────────
-  bot:
+  # ── Business Multi-Agent API + Teams Bot ────────────────────────────────────
+  api:
     build:
       context: .
       dockerfile: Dockerfile
     image: business-multiagent:latest
-    container_name: business-bot
+    container_name: business-api
     restart: unless-stopped
 
     # Load credentials from .env file (git-ignored)
     env_file: .env
 
-    # Override the Camunda URL to point at the Camunda service below (if used)
     environment:
       CAMUNDA_REST_URL: http://camunda:8080/engine-rest
       BUSINESS_OUTPUT_DIR: /app/business_output
 
+    # Port 8000: REST API  +  Teams Bot Framework /api/messages
     ports:
-      - "${TEAMS_PORT:-3978}:3978"
+      - "8000:8000"
 
     volumes:
       # Persist generated documents, diagrams, and BPMN files
@@ -45,7 +43,7 @@ services:
         condition: service_healthy
 
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3978/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
       timeout: 10s
       retries: 3

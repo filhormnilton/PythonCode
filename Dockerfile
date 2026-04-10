@@ -4,11 +4,16 @@
 # Build:
 #   docker build -t business-multiagent .
 #
+# Run (REST API mode — for Azure App Service / Container Apps):
+#   docker run --env-file .env -p 8000:8000 business-multiagent
+#
 # Run (Teams bot mode):
-#   docker run --env-file .env -p 3978:3978 business-multiagent
+#   docker run --env-file .env -p 3978:3978 business-multiagent \
+#       python business_main.py --mode teams
 #
 # Run (CLI mode):
-#   docker run --env-file .env -it business-multiagent --mode cli
+#   docker run --env-file .env -it business-multiagent \
+#       python business_main.py --mode cli
 # ─────────────────────────────────────────────────────────────────────────────
 
 # ── Stage 1: dependency builder ───────────────────────────────────────────────
@@ -38,20 +43,19 @@ WORKDIR /app
 COPY --from=builder /install /usr/local
 
 # Copy application source
-COPY business/ ./business/
+COPY Business/ ./Business/
 COPY business_main.py .
+COPY api_server.py .
 
 # Create output directory and assign ownership
 RUN mkdir -p /app/business_output && chown -R appuser:appuser /app
 
 USER appuser
 
-# Expose Teams bot port
-EXPOSE 3978
+# Expose REST API port
+EXPOSE 8000
 
-# Default: run as Teams bot server
-# Override ENTRYPOINT args to run in other modes:
-#   docker run ... --mode cli
-#   docker run ... --mode once --request "..."
-ENTRYPOINT ["python", "business_main.py"]
-CMD ["--mode", "teams"]
+# Default: run as REST API server (Azure App Service / Container Apps)
+# Override CMD to run in other modes.
+ENTRYPOINT ["python", "api_server.py"]
+CMD ["--host", "0.0.0.0", "--port", "8000"]

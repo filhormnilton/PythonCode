@@ -1,0 +1,45 @@
+# ── Git ───────────────────────────────────────────────────────────────────────
+.git/
+.gitignore
+.github/
+
+# ── Dev/test frontend — NOT part of the production image ─────────────────────
+dev_ui/
+
+# ── Test artefacts ─────────────────────────────────────────────────────────────
+tests/
+test_*.py
+pytest.ini
+.pytest_cache/
+
+# ── Proof-of-concept sketches ─────────────────────────────────────────────────
+Poc/
+
+# ── Generated output (mounted as a volume in production) ─────────────────────
+business_output/
+
+# ── Python artefacts ──────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+.mypy_cache/
+.ruff_cache/
+
+# ── Virtual environments ───────────────────────────────────────────────────────
+.venv/
+venv/
+env/
+
+# ── Local secrets ─────────────────────────────────────────────────────────────
+.env
+*.env.*
+
+# ── OS ────────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db

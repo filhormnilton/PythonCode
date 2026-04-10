@@ -18,10 +18,11 @@ build/
 venv/
 env/
 
-# Environment variables (secrets)
+# Environment variables (secrets — never commit)
 .env
+*.env.*
 
-# Output directories
+# Output directories (mounted as a volume in production)
 business_output/
 
 # OS artifacts

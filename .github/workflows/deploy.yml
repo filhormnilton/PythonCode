@@ -1,0 +1,88 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# deploy.yml — Build Docker image and deploy to Azure Container Apps
+#
+# Trigger: every push to the `main` branch.
+#
+# Required GitHub Secrets (Settings → Secrets and variables → Actions):
+#
+#   AZURE_CREDENTIALS          Service principal JSON produced by:
+#                                az ad sp create-for-rbac \
+#                                  --name business-multiagent-sp \
+#                                  --role contributor \
+#                                  --scopes /subscriptions/<sub>/resourceGroups/<rg> \
+#                                  --sdk-auth
+#
+#   REGISTRY_LOGIN_SERVER      ACR login server   e.g.  myregistry.azurecr.io
+#   REGISTRY_USERNAME          ACR admin username (or service principal client ID)
+#   REGISTRY_PASSWORD          ACR admin password (or service principal client secret)
+#
+#   AZURE_RESOURCE_GROUP       Resource group that contains the Container App
+#   CONTAINER_APP_NAME         Azure Container App name
+#
+# Application secrets (set once via Portal / az CLI, NOT cycled by this pipeline):
+#   OPENAI_API_KEY, JIRA_SERVER, JIRA_USER, JIRA_API_TOKEN, JIRA_PROJECT_KEY,
+#   MIRO_ACCESS_TOKEN, MIRO_BOARD_ID, TAVILY_API_KEY, TEAMS_APP_ID,
+#   TEAMS_APP_PASSWORD, API_KEY, COSMOS_ENDPOINT, COSMOS_KEY  (optional)
+#
+# ─────────────────────────────────────────────────────────────────────────────
+
+name: Build & Deploy to Azure Container Apps
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:   # allow manual trigger from GitHub UI
+
+env:
+  IMAGE_NAME: business-multiagent
+
+jobs:
+  build-and-deploy:
+    name: Build image and deploy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      # ── 1. Checkout ──────────────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── 2. Login to Azure ────────────────────────────────────────────────
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # ── 3. Login to Azure Container Registry ─────────────────────────────
+      - name: Login to Azure Container Registry
+        uses: azure/docker-login@v2
+        with:
+          login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+          username:     ${{ secrets.REGISTRY_USERNAME }}
+          password:     ${{ secrets.REGISTRY_PASSWORD }}
+
+      # ── 4. Build and push the Docker image ───────────────────────────────
+      - name: Build and push Docker image
+        run: |
+          IMAGE_FULL="${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}"
+          docker build \
+            --tag "${IMAGE_FULL}:${{ github.sha }}" \
+            --tag "${IMAGE_FULL}:latest" \
+            .
+          docker push "${IMAGE_FULL}:${{ github.sha }}"
+          docker push "${IMAGE_FULL}:latest"
+
+      # ── 5. Deploy to Azure Container Apps ────────────────────────────────
+      - name: Deploy to Azure Container Apps
+        uses: azure/container-apps-deploy-action@v2
+        with:
+          resourceGroup:    ${{ secrets.AZURE_RESOURCE_GROUP }}
+          containerAppName: ${{ secrets.CONTAINER_APP_NAME }}
+          imageToDeploy:    ${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+
+      # ── 6. Azure logout ───────────────────────────────────────────────────
+      - name: Azure logout
+        if: always()
+        run: az logout

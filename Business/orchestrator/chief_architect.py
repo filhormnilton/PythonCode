@@ -22,7 +22,7 @@ from typing import Any, Dict, List, Optional
 
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.tools import BaseTool, tool
-from langchain.agents import create_agent
+from langgraph.prebuilt import create_react_agent
 from Business.agents.base import AgentWrapper
 
 from Business.agents.architect_agent import create_architect_agent
@@ -129,6 +129,24 @@ _ORCHESTRATOR_SYSTEM_PROMPT = """\
 - Other group members are present — your responses are visible to the entire group.
 - You are a **senior colleague**, not a chatbot assistant — communicate accordingly.
 - Be direct, exec-level, and professional. No assistant clichés or filler phrases.
+
+## [JIRA DIRECT TOOLS — USE THESE FOR SEARCH/LIST]
+- For ANY request to list, search or count JIRA issues, call `search_jira_issues` or
+  `get_project_backlog` **directly** — do NOT delegate to the JIRA agent.
+- These tools fetch the complete paginated result from JIRA API. Return the full output
+  verbatim as a Markdown table. NEVER summarize, truncate, or sample the list.
+- Only delegate to `delegate_to_jira` for write operations (create, update, comment, transition).
+
+## [USER STORY AUTHORING — MANDATORY DELEGATION RULE]
+⚠️  CRITICAL: You MUST NEVER write or draft a User Story yourself.
+ANY request involving: "user story", "história de usuário", "escrever story", "criar story",
+"redigir requisito", "elaborar história", "story para", "história para" — MUST be
+immediately delegated to `delegate_to_jira` with the full original request.
+The JIRA agent is a Principal Business Analyst with 15+ years of experience.
+Its output quality is designed to exceed Atlassian Rovo. Do NOT attempt to draft
+the story yourself — you will produce an inferior, shallow result.
+Your role is ONLY to: (1) pass the request to delegate_to_jira, (2) present the
+result to the user, (3) offer the refinement loop.
 
 ## [ORCHESTRATION_HELPER_REGISTRY]
 helpers:
@@ -407,8 +425,15 @@ class BusinessOrchestrator:
         active = self._enabled_agents if self._enabled_agents is not None else _ALL_AGENTS
         selected_tools = [_agent_tools[name] for name in active]
 
+        # JIRA read tools exposed directly on the orchestrator so the full
+        # result is returned without passing through the sub-agent LLM (which
+        # would summarise/truncate lists of 100+ issues).
+        from Business.mcp.api_jira import search_jira_issues, get_project_backlog  # noqa: PLC0415
+
         return [
             *selected_tools,
+            search_jira_issues,
+            get_project_backlog,
             # Knowledge base tools are directly available to the orchestrator
             *KNOWLEDGE_BASE_TOOLS,
         ]
@@ -419,10 +444,10 @@ class BusinessOrchestrator:
 
     def _build_executor(self) -> AgentWrapper:
         tools = self._build_tools()
-        graph = create_agent(
+        graph = create_react_agent(
             model=self._llm,
             tools=tools,
-            system_prompt=_ORCHESTRATOR_SYSTEM_PROMPT,
+            prompt=_ORCHESTRATOR_SYSTEM_PROMPT,
         )
         return AgentWrapper(graph, "ORCHESTRATOR")
 
@@ -512,6 +537,105 @@ class BusinessOrchestrator:
         """
         if self._executor is None:
             self._executor = self._build_executor()
+
+        # 0️⃣  Direct agent router — bypass LLM for requests clearly within a specialist scope.
+        #     The LLM tends to answer directly (producing shallow output) instead of delegating.
+        #     We detect scope keywords and route straight to the responsible specialist agent.
+        _AGENT_ROUTING_TABLE = [
+            # (agent_name, keywords_tuple)
+            ("jira", (
+                "user story", "user storie", "história de usuário", "historia de usuario",
+                "escreva uma story", "escreva a story", "crie uma story", "criar story",
+                "redigir story", "redigir história", "elaborar história", "elaborar story",
+                "escrever story", "escrever história", "gerar story", "gerar história",
+                "story para", "história para", "write a story", "write user story",
+                "draft a story", "draft user story",
+                "criar issue", "criar bug", "criar task", "criar epic",
+                "atualizar issue", "fechar issue", "mover issue", "transicionar issue",
+                "add comment", "adicionar comentário", "buscar no backlog", "pesquisar backlog",
+                "listar issues", "listar backlog", "criar sprint", "adicionar ao sprint",
+                "backlog do projeto", "jql",
+            )),
+            ("docs", (
+                "criar documento", "gerar documento", "escrever documento",
+                "criar word", "gerar word", "criar pdf", "gerar pdf",
+                "criar txt", "gerar txt", "documento word", "documento pdf",
+                "redigir documento", "elaborar documento", "create document",
+                "generate document", "write document", "documentação técnica",
+                "especificação técnica", "relatório técnico",
+            )),
+            ("slides", (
+                "criar apresentação", "gerar apresentação", "criar slides",
+                "gerar slides", "criar powerpoint", "gerar powerpoint",
+                "criar ppt", "gerar ppt", "apresentação executiva",
+                "slide deck", "create presentation", "generate slides",
+                "criar slide", "montar apresentação",
+            )),
+            ("architect", (
+                "criar diagrama", "gerar diagrama", "desenhar diagrama",
+                "diagrama de arquitetura", "diagrama c4", "diagrama de sequência",
+                "diagrama erd", "draw.io", "drawio", "arquitetura hexagonal",
+                "arquitetura de sistema", "criar arquitetura", "modelar arquitetura",
+                "create diagram", "generate diagram", "architecture diagram",
+                "sequence diagram", "component diagram",
+            )),
+            ("process", (
+                "criar bpmn", "gerar bpmn", "modelar processo", "criar processo",
+                "fluxo de processo", "diagrama de processo", "camunda",
+                "criar fluxo", "modelar fluxo", "process flow", "bpmn diagram",
+                "business process", "workflow", "criar workflow",
+            )),
+            ("miro", (
+                "criar board", "criar quadro", "miro board", "brainstorming",
+                "mind map", "mapa mental", "criar mapa", "sticky notes",
+                "post-its", "canvas", "criar canvas", "ideação",
+                "workshop virtual", "criar diagrama no miro",
+            )),
+            ("charts", (
+                "criar gráfico", "gerar gráfico", "criar chart", "gerar chart",
+                "gráfico de barras", "gráfico de linha", "gráfico de pizza",
+                "bar chart", "line chart", "pie chart", "scatter chart",
+                "plotar dados", "visualizar dados", "gerar png", "criar png",
+                "generate chart", "create chart", "chart png",
+            )),
+            ("web", (
+                "pesquisar na web", "buscar na web", "pesquise sobre",
+                "busque sobre", "faça uma pesquisa", "pesquisa sobre",
+                "web search", "search the web", "buscar informações sobre",
+                "encontre informações", "pesquisar benchmarks", "buscar documentação",
+                "fetch url", "acessar url", "extrair conteúdo de",
+            )),
+        ]
+
+        _lower_input = user_input.lower()
+        for agent_name, keywords in _AGENT_ROUTING_TABLE:
+            if self._enabled_agents is not None and agent_name not in self._enabled_agents:
+                continue
+            if agent_name in self._unavailable_agents:
+                continue
+            if any(kw in _lower_input for kw in keywords):
+                logger.info(
+                    "[ORCHESTRATOR] Direct route: '%s' → %s agent",
+                    user_input[:60], agent_name.upper(),
+                )
+                try:
+                    agent = self._get_agent(agent_name)
+                    agent_payload: Dict[str, Any] = {"input": user_input}
+                    if chat_history:
+                        agent_payload["chat_history"] = chat_history
+                    result = agent.invoke(agent_payload)
+                    raw_response = result.get("output", "")
+                    if raw_response:
+                        response = _format_response(raw_response)
+                        self._auto_learn(user_input, response)
+                        return response
+                except Exception as exc:
+                    logger.error(
+                        "[ORCHESTRATOR] %s agent failed on direct route: %s — falling through to orchestrator.",
+                        agent_name.upper(), exc,
+                    )
+                    self._unavailable_agents.add(agent_name)
+                break  # matched but agent failed — fall through to normal flow
 
         # 1️⃣  Pre-search: inject relevant knowledge base context
         kb_context = self._search_knowledge_context(user_input)

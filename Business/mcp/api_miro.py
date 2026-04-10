@@ -467,6 +467,7 @@ def get_miro_canvas_offset(board_id: str = "") -> str:
 
 
 MIRO_TOOLS = [
+    create_miro_board,
     get_miro_board,
     get_miro_canvas_offset,
     create_sticky_note,

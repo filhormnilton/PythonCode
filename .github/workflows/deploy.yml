@@ -29,10 +29,14 @@
 name: Build & Deploy to Azure Container Apps
 
 on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:   # allow manual trigger from GitHub UI
+  workflow_dispatch:   # trigger manual pelo GitHub UI (Actions → Run workflow)
+  # push para main habilitado apenas após configurar os secrets do Azure:
+  # AZURE_CREDENTIALS, REGISTRY_LOGIN_SERVER, REGISTRY_USERNAME,
+  # REGISTRY_PASSWORD, AZURE_RESOURCE_GROUP, CONTAINER_APP_NAME
+  #
+  # push:
+  #   branches:
+  #     - main
 
 env:
   IMAGE_NAME: business-multiagent
